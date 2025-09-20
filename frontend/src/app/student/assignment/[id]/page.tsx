@@ -19,13 +19,18 @@ export default function AssignmentPage() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitted, setSubmitted] = useState(false);
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<{
+    weakTopics: string[];
+    strongTopics: string[];
+    overallScore: number;
+    recommendations: string[];
+  } | null>(null);
 
   useEffect(() => {
     if (params.id) {
       fetchQuestions();
     }
-  }, [params.id]);
+  }, [params.id, fetchQuestions]);
 
   const fetchQuestions = async () => {
     try {

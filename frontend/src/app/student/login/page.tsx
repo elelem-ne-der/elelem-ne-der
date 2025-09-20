@@ -1,30 +1,30 @@
-'use client';
+&#39;use client&#39;;
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { useState } from &#39;react&#39;;
+import Link from &#39;next/link&#39;;
+import { useAuth } from &#39;@/contexts/AuthContext&#39;;
+import { useRouter } from &#39;next/navigation&#39;;
 
 export default function StudentLogin() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: &#39;&#39;,
+    password: &#39;&#39;
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState(&#39;&#39;);
   const [loading, setLoading] = useState(false);
   const { signIn } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError(&#39;&#39;);
     setLoading(true);
 
     try {
       await signIn(formData.email, formData.password);
-      router.push('/student/dashboard');
-    } catch (error: any) {
-      setError(error.message);
+      router.push(&#39;/student/dashboard&#39;);
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : &#39;Bir hata oluştu&#39;);
     } finally {
       setLoading(false);
     }
@@ -76,13 +76,13 @@ export default function StudentLogin() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
-            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+            {loading ? &#39;Giriş yapılıyor...&#39; : &#39;Giriş Yap&#39;}
           </button>
         </form>
         
         <div className="mt-6 text-center">
           <p className="text-gray-600">
-            Hesabın yok mu?{' '}
+            Hesabın yok mu?{&#39; &#39;}
             <Link href="/student/register" className="text-blue-600 hover:underline">
               Kayıt ol
             </Link>

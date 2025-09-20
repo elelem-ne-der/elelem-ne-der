@@ -1,18 +1,18 @@
-'use client';
+&#39;use client&#39;;
 
-import { useState } from 'react';
-import Link from 'next/link';
+import { useState } from &#39;react&#39;;
+import Link from &#39;next/link&#39;;
 
 export default function ParentLogin() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: ''
+    email: &#39;&#39;,
+    password: &#39;&#39;
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // TODO: Implement Supabase auth
-    console.log('Parent login:', formData);
+    console.log(&#39;Parent login:&#39;, formData);
   };
 
   return (
@@ -60,7 +60,7 @@ export default function ParentLogin() {
         
         <div className="mt-6 text-center">
           <p className="text-gray-600">
-            Hesabın yok mu?{' '}
+            Hesabın yok mu?{&#39; &#39;}
             <Link href="/parent/register" className="text-purple-600 hover:underline">
               Kayıt ol
             </Link>

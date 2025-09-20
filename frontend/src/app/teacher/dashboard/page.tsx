@@ -1,7 +1,7 @@
-'use client';
+&#39;use client&#39;;
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
+import { useState, useEffect } from &#39;react&#39;;
+import Link from &#39;next/link&#39;;
 
 interface Assignment {
   id: number;
@@ -23,11 +23,11 @@ export default function TeacherDashboard() {
 
   const fetchAssignments = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/assignments');
+      const response = await fetch(&#39;http://localhost:3001/api/assignments&#39;);
       const data = await response.json();
       setAssignments(data);
     } catch (error) {
-      console.error('Error fetching assignments:', error);
+      console.error(&#39;Error fetching assignments:&#39;, error);
     } finally {
       setLoading(false);
     }
@@ -162,7 +162,7 @@ export default function TeacherDashboard() {
                     {assignment.questions} soru
                   </span>
                   <span className="text-sm text-gray-500">
-                    {new Date(assignment.created_at).toLocaleDateString('tr-TR')}
+                    {new Date(assignment.created_at).toLocaleDateString(&#39;tr-TR&#39;)}
                   </span>
                 </div>
                 

@@ -1,7 +1,7 @@
-'use client';
+&#39;use client&#39;;
 
-import { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useState, useEffect } from &#39;react&#39;;
+import { useParams, useRouter } from &#39;next/navigation&#39;;
 
 interface Question {
   id: number;
@@ -26,12 +26,6 @@ export default function AssignmentPage() {
     recommendations: string[];
   } | null>(null);
 
-  useEffect(() => {
-    if (params.id) {
-      fetchQuestions();
-    }
-  }, [params.id, fetchQuestions]);
-
   const fetchQuestions = async () => {
     try {
       const response = await fetch(`http://localhost:3001/api/questions/${params.id}`);
@@ -39,11 +33,17 @@ export default function AssignmentPage() {
       setQuestions(data);
       setAnswers(new Array(data.length).fill(-1));
     } catch (error) {
-      console.error('Error fetching questions:', error);
+      console.error(&#39;Error fetching questions:&#39;, error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (params.id) {
+      fetchQuestions();
+    }
+  }, [params.id]);
 
   const handleAnswerSelect = (answerIndex: number) => {
     const newAnswers = [...answers];
@@ -72,14 +72,14 @@ export default function AssignmentPage() {
         tags: question.tags
       }));
 
-      const response = await fetch('http://localhost:3001/api/analyze-results', {
-        method: 'POST',
+      const response = await fetch(&#39;http://localhost:3001/api/analyze-results&#39;, {
+        method: &#39;POST&#39;,
         headers: {
-          'Content-Type': 'application/json',
+          &#39;Content-Type&#39;: &#39;application/json&#39;,
         },
         body: JSON.stringify({
           answers: studentAnswers,
-          studentId: 'demo-student'
+          studentId: &#39;demo-student&#39;
         }),
       });
 
@@ -87,7 +87,7 @@ export default function AssignmentPage() {
       setResults(analysis);
       setSubmitted(true);
     } catch (error) {
-      console.error('Error submitting answers:', error);
+      console.error(&#39;Error submitting answers:&#39;, error);
     }
   };
 
@@ -154,10 +154,10 @@ export default function AssignmentPage() {
 
             <div className="text-center">
               <button
-                onClick={() => router.push('/student/dashboard')}
+                onClick={() => router.push(&#39;/student/dashboard&#39;)}
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
               >
-                Dashboard'a Dön
+                Dashboard&#39;a Dön
               </button>
             </div>
           </div>
@@ -174,10 +174,10 @@ export default function AssignmentPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Ödev Bulunamadı</h1>
           <p className="text-gray-600 mb-4">Bu ödev mevcut değil veya erişim yetkiniz yok.</p>
           <button
-            onClick={() => router.push('/student/dashboard')}
+            onClick={() => router.push(&#39;/student/dashboard&#39;)}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
           >
-            Dashboard'a Dön
+            Dashboard&#39;a Dön
           </button>
         </div>
       </div>
@@ -223,8 +223,8 @@ export default function AssignmentPage() {
                 key={index}
                 className={`block p-4 border-2 rounded-lg cursor-pointer transition ${
                   answers[currentQuestion] === index
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? &#39;border-blue-500 bg-blue-50&#39;
+                    : &#39;border-gray-200 hover:border-gray-300&#39;
                 }`}
               >
                 <input

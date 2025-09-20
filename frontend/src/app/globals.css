@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
 
 :root {
   --background: #ffffff;
@@ -55,13 +56,13 @@ body {
 }
 
 /* individual variations */
-.bg-icon.i1 { left: 6%; top: -10vh; font-size: 72px; animation: fall 26s linear infinite; animation-delay: 0s; }
-.bg-icon.i2 { left: 28%; top: -20vh; font-size: 56px; animation: fall 18s linear infinite; animation-delay: 2s; }
-.bg-icon.i3 { left: 50%; top: -15vh; font-size: 64px; animation: fall 22s linear infinite; animation-delay: 4s; }
-.bg-icon.i4 { left: 72%; top: -18vh; font-size: 60px; animation: fall 20s linear infinite; animation-delay: 6s; }
-.bg-icon.i5 { left: 85%; top: -12vh; font-size: 48px; animation: fall 24s linear infinite; animation-delay: 1s; }
-.bg-icon.i6 { left: 40%; top: -8vh; font-size: 68px; animation: fall 28s linear infinite; animation-delay: 3s; }
-.bg-icon.i7 { left: 18%; top: -5vh; font-size: 52px; animation: fall 30s linear infinite; animation-delay: 5s; }
+.bg-icon.i1 { left: 6%; top: -10vh; font-size: 72px; animation: fall 50s linear infinite; animation-delay: 0s; }
+.bg-icon.i2 { left: 28%; top: -20vh; font-size: 56px; animation: fall 48s linear infinite; animation-delay: 4s; }
+.bg-icon.i3 { left: 50%; top: -15vh; font-size: 64px; animation: fall 55s linear infinite; animation-delay: 6s; }
+.bg-icon.i4 { left: 72%; top: -18vh; font-size: 60px; animation: fall 52s linear infinite; animation-delay: 8s; }
+.bg-icon.i5 { left: 85%; top: -12vh; font-size: 48px; animation: fall 54s linear infinite; animation-delay: 2s; }
+.bg-icon.i6 { left: 40%; top: -8vh; font-size: 68px; animation: fall 60s linear infinite; animation-delay: 10s; }
+.bg-icon.i7 { left: 18%; top: -5vh; font-size: 52px; animation: fall 58s linear infinite; animation-delay: 12s; }
 
 @keyframes fall {
   0% { transform: translateY(0vh) rotate(0deg); opacity: 0.08; }

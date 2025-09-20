@@ -4,13 +4,13 @@ export default function Home() {
   return (
     <div className="min-h-screen animated-bg relative">
       <div className="bg-icons" aria-hidden>
-        <i className="fi fi-ts-book-open-cover bg-icon i1"></i>
-        <i className="fi fi-ts-book-bookmark bg-icon i2"></i>
-        <i className="fi fi-tr-react bg-icon i3"></i>
-        <i className="fi fi-tr-dna bg-icon i4"></i>
-        <i className="fi fi-tr-microscope bg-icon i5"></i>
-        <i className="fi fi-rr-function bg-icon i6"></i>
-        <i className="fi fi-rr-square-root bg-icon i7"></i>
+        <i className="fa-solid fa-book-open bg-icon i1" aria-hidden></i>
+        <i className="fa-solid fa-bookmark bg-icon i2" aria-hidden></i>
+        <i className="fa-brands fa-react bg-icon i3" aria-hidden></i>
+        <i className="fa-solid fa-dna bg-icon i4" aria-hidden></i>
+        <i className="fa-solid fa-microscope bg-icon i5" aria-hidden></i>
+        <i className="fa-solid fa-superscript bg-icon i6" aria-hidden></i>
+        <i className="fa-solid fa-square-root-variable bg-icon i7" aria-hidden></i>
       </div>
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="text-center">

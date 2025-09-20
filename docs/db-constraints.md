@@ -1,0 +1,2 @@
+
+Her öğrencinin bir velisi 

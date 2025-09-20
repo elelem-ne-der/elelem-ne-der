@@ -61,8 +61,8 @@ export default function TeacherLogin() {
         <div className="mt-6 text-center">
           <p className="text-gray-600">
             Hesabın yok mu?{' '}
-            <Link href="/teacher/register" className="text-green-600 hover:underline">
-              Kayıt ol
+            <Link href="/teacher/register" className="font-medium text-green-600 hover:text-green-500">
+              Öğretmen olarak kayıt olun
             </Link>
           </p>
         </div>

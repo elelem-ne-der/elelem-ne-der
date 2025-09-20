@@ -128,6 +128,12 @@ export default function ParentLogin() {
           </div>
 
           <div className="text-center">
+            <p className="text-sm text-gray-600 mb-2">
+              Hesabınız yok mu?{' '}
+              <Link href="/parent/register" className="font-medium text-purple-600 hover:text-purple-500">
+                Veli olarak kayıt olun
+              </Link>
+            </p>
             <Link
               href="/"
               className="text-sm text-gray-600 hover:text-gray-900"

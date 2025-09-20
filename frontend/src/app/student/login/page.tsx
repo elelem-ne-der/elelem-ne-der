@@ -90,6 +90,12 @@ export default function StudentLogin() {
         </div>
         
         <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600 mb-2">
+            Hesabınız yok mu?{' '}
+            <Link href="/student/register" className="font-medium text-indigo-600 hover:text-indigo-500">
+              Öğrenci olarak kayıt olun
+            </Link>
+          </p>
           <Link href="/" className="text-gray-500 hover:underline">
             ← Ana sayfaya dön
           </Link>

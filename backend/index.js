@@ -21,6 +21,19 @@ app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
+// API Status
+app.get('/api/status', (req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Backend API çalışıyor',
+    timestamp: new Date().toISOString(),
+    services: {
+      supabase: process.env.SUPABASE_URL ? 'bağlı' : 'bağlı değil',
+      ai: process.env.HUGGINGFACE_API_KEY ? 'bağlı' : 'bağlı değil'
+    }
+  });
+});
+
 // Sample data endpoints
 app.get('/api/assignments', (req, res) => {
   const assignments = [

@@ -27,7 +27,15 @@ export default function TestPage() {
   const testAI = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/tag-question', {
+      // Önce basit bir test yapalım
+      const response = await fetch('http://localhost:3001/api/status');
+
+      if (!response.ok) {
+        throw new Error(`Backend çalışmıyor! Status: ${response.status}`);
+      }
+
+      // AI endpoint'ini test et
+      const aiResponse = await fetch('http://localhost:3001/api/tag-question', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,10 +44,20 @@ export default function TestPage() {
           question: '1/2 + 1/4 = ?'
         }),
       });
-      const data = await response.json();
+
+      if (!aiResponse.ok) {
+        const errorText = await aiResponse.text();
+        throw new Error(`AI endpoint hatası: ${aiResponse.status} - ${errorText}`);
+      }
+
+      const data = await aiResponse.json();
       setTestResult({ success: true, data });
     } catch (error) {
-      setTestResult({ success: false, error: error instanceof Error ? error.message : 'Bilinmeyen hata' });
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+      setTestResult({
+        success: false,
+        error: `AI Test Hatası: ${errorMessage}\n\n🔍 Sorun Giderme:\n1. Backend çalışıyor mu? (http://localhost:3001)\n2. Backend sunucusunu başlat (cd backend && node index.js)\n3. .env.local dosyasında HUGGINGFACE_API_KEY var mı?\n4. Supabase bağlantısı çalışıyor mu?`
+      });
     } finally {
       setLoading(false);
     }
@@ -63,7 +81,10 @@ export default function TestPage() {
           </div>
 
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-semibold mb-4">AI Test</h2>
+            <h2 className="text-xl font-semibold mb-4 text-gray-900">AI Test</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Bu test backend'in AI fonksiyonlarını kontrol eder. Gerçek AI için HUGGINGFACE_API_KEY gerekli.
+            </p>
             <button
               onClick={testAI}
               disabled={loading}
@@ -76,8 +97,8 @@ export default function TestPage() {
 
         {testResult && (
           <div className="mt-8 bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">Test Sonucu</h3>
-            <pre className="bg-gray-100 p-4 rounded-lg overflow-auto">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">Test Sonucu</h3>
+            <pre className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-auto">
               {JSON.stringify(testResult, null, 2)}
             </pre>
           </div>

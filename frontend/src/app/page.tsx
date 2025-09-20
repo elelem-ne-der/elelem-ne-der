@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen animated-bg">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center">
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
@@ -24,7 +24,7 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="bg-white rounded-lg shadow-lg p-8">
               <div className="text-4xl mb-4">👨‍🎓</div>
-              <h3 className="text-2xl font-semibold mb-4">Öğrenci</h3>
+              <h3 className="text-2xl font-semibold mb-4 card-title-student">Öğrenci</h3>
               <p className="text-gray-600 mb-6">
                 Ödevlerini çöz, hatalarını öğren, kişisel yol haritanı takip et
               </p>
@@ -38,7 +38,7 @@ export default function Home() {
             
             <div className="bg-white rounded-lg shadow-lg p-8">
               <div className="text-4xl mb-4">👨‍🏫</div>
-              <h3 className="text-2xl font-semibold mb-4">Öğretmen</h3>
+              <h3 className="text-2xl font-semibold mb-4 card-title-teacher">Öğretmen</h3>
               <p className="text-gray-600 mb-6">
                 Ödev oluştur, öğrenci ilerlemesini takip et, raporları incele
               </p>
@@ -52,7 +52,7 @@ export default function Home() {
             
             <div className="bg-white rounded-lg shadow-lg p-8">
               <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
-              <h3 className="text-2xl font-semibold mb-4">Veli</h3>
+              <h3 className="text-2xl font-semibold mb-4 card-title-parent">Veli</h3>
               <p className="text-gray-600 mb-6">
                 Çocuğunun gelişimini takip et, detaylı raporları görüntüle
               </p>

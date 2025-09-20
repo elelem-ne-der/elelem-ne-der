@@ -1,4 +1,4 @@
-import Link from &#39;next/link&#39;;
+import Link from 'next/link';
 
 export default function Home() {
   return (

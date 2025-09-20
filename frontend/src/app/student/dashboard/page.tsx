@@ -1,9 +1,9 @@
-&#39;use client&#39;;
+'use client';
 
-import { useState, useEffect } from &#39;react&#39;;
-import Link from &#39;next/link&#39;;
-import { useAuth } from &#39;@/contexts/AuthContext&#39;;
-import { useRouter } from &#39;next/navigation&#39;;
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface Assignment {
   id: number;
@@ -23,7 +23,7 @@ export default function StudentDashboard() {
 
   useEffect(() => {
     if (!user) {
-      router.push(&#39;/student/login&#39;);
+      router.push('/student/login');
       return;
     }
     fetchAssignments();
@@ -31,11 +31,11 @@ export default function StudentDashboard() {
 
   const fetchAssignments = async () => {
     try {
-      const response = await fetch(&#39;http://localhost:3001/api/assignments&#39;);
+      const response = await fetch('http://localhost:3001/api/assignments');
       const data = await response.json();
       setAssignments(data);
     } catch (error) {
-      console.error(&#39;Error fetching assignments:&#39;, error);
+      console.error('Error fetching assignments:', error);
     } finally {
       setLoading(false);
     }
@@ -114,7 +114,7 @@ export default function StudentDashboard() {
                     {assignment.questions} soru
                   </span>
                   <span className="text-sm text-gray-500">
-                    {new Date(assignment.created_at).toLocaleDateString(&#39;tr-TR&#39;)}
+                    {new Date(assignment.created_at).toLocaleDateString('tr-TR')}
                   </span>
                 </div>
                 

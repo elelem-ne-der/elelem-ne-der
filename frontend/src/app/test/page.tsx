@@ -1,7 +1,7 @@
-&#39;use client&#39;;
+'use client';
 
-import { useState } from &#39;react&#39;;
-import Link from &#39;next/link&#39;;
+import { useState } from 'react';
+import Link from 'next/link';
 
 export default function TestPage() {
   const [testResult, setTestResult] = useState<{
@@ -14,11 +14,11 @@ export default function TestPage() {
   const testBackend = async () => {
     setLoading(true);
     try {
-      const response = await fetch(&#39;http://localhost:3001/api/assignments&#39;);
+      const response = await fetch('http://localhost:3001/api/assignments');
       const data = await response.json();
       setTestResult({ success: true, data });
     } catch (error) {
-      setTestResult({ success: false, error: error instanceof Error ? error.message : &#39;Bilinmeyen hata&#39; });
+      setTestResult({ success: false, error: error instanceof Error ? error.message : 'Bilinmeyen hata' });
     } finally {
       setLoading(false);
     }
@@ -27,19 +27,19 @@ export default function TestPage() {
   const testAI = async () => {
     setLoading(true);
     try {
-      const response = await fetch(&#39;http://localhost:3001/api/tag-question&#39;, {
-        method: &#39;POST&#39;,
+      const response = await fetch('http://localhost:3001/api/tag-question', {
+        method: 'POST',
         headers: {
-          &#39;Content-Type&#39;: &#39;application/json&#39;,
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          question: &#39;1/2 + 1/4 = ?&#39;
+          question: '1/2 + 1/4 = ?'
         }),
       });
       const data = await response.json();
       setTestResult({ success: true, data });
     } catch (error) {
-      setTestResult({ success: false, error: error instanceof Error ? error.message : &#39;Bilinmeyen hata&#39; });
+      setTestResult({ success: false, error: error instanceof Error ? error.message : 'Bilinmeyen hata' });
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ export default function TestPage() {
               disabled={loading}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
-              {loading ? &#39;Test ediliyor...&#39; : &#39;Backend API Test Et&#39;}
+              {loading ? 'Test ediliyor...' : 'Backend API Test Et'}
             </button>
           </div>
 
@@ -69,7 +69,7 @@ export default function TestPage() {
               disabled={loading}
               className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50"
             >
-              {loading ? &#39;Test ediliyor...&#39; : &#39;AI Servis Test Et&#39;}
+              {loading ? 'Test ediliyor...' : 'AI Servis Test Et'}
             </button>
           </div>
         </div>

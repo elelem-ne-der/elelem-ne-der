@@ -13,29 +13,59 @@ CREATE TABLE profiles (
 -- Öğrenci profili
 CREATE TABLE students (
   id UUID REFERENCES profiles(id) PRIMARY KEY,
-  grade INTEGER NOT NULL CHECK (grade >= 1 AND grade <= 12),
-  parent_id UUID REFERENCES profiles(id),
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  student_number TEXT UNIQUE NOT NULL, -- Öğrenci numarası (unique)
+  first_name TEXT NOT NULL, -- Ad (zorunlu)
+  last_name TEXT NOT NULL, -- Soyad (zorunlu)
+  middle_name TEXT, -- Orta isim (isteğe bağlı)
+  grade INTEGER NOT NULL CHECK (grade >= 5 AND grade <= 12), -- 5-12. sınıf arası
+  province TEXT NOT NULL, -- İl (zorunlu)
+  district TEXT NOT NULL, -- İlçe (zorunlu)
+  school_type TEXT NOT NULL CHECK (school_type IN ('ortaokul', 'lise')), -- Okul türü
+  school_name TEXT NOT NULL, -- Okul adı (zorunlu)
+  parent_id UUID REFERENCES profiles(id), -- Maksimum 1 veli
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Öğretmen profili
 CREATE TABLE teachers (
   id UUID REFERENCES profiles(id) PRIMARY KEY,
-  school TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  teacher_number TEXT UNIQUE NOT NULL, -- Öğretmen numarası (unique)
+  first_name TEXT NOT NULL, -- Ad (zorunlu)
+  last_name TEXT NOT NULL, -- Soyad (zorunlu)
+  middle_name TEXT, -- Orta isim (isteğe bağlı)
+  province TEXT NOT NULL, -- İl (zorunlu)
+  district TEXT NOT NULL, -- İlçe (zorunlu)
+  school_name TEXT NOT NULL, -- Okul adı (zorunlu)
+  contact_info JSONB NOT NULL CHECK (jsonb_array_length(contact_info) >= 1), -- En az 1 mail/telefon
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Veli profili
 CREATE TABLE parents (
   id UUID REFERENCES profiles(id) PRIMARY KEY,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  first_name TEXT NOT NULL, -- Ad (zorunlu)
+  last_name TEXT NOT NULL, -- Soyad (zorunlu)
+  middle_name TEXT, -- Orta isim (isteğe bağlı)
+  phone TEXT, -- Telefon numarası
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Veli-Öğrenci ilişkisi
+-- Veli-Öğrenci ilişkisi (1 veli - 1 öğrenci kısıtı için)
 CREATE TABLE parent_students (
-  parent_id UUID REFERENCES parents(id),
-  student_id UUID REFERENCES students(id),
-  PRIMARY KEY (parent_id, student_id)
+  parent_id UUID REFERENCES parents(id) ON DELETE CASCADE,
+  student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+  relationship TEXT DEFAULT 'veli', -- anne/baba/vasi vb.
+  PRIMARY KEY (parent_id, student_id),
+  CONSTRAINT one_parent_per_student CHECK (
+    NOT EXISTS (
+      SELECT 1 FROM parent_students ps2
+      WHERE ps2.student_id = parent_students.student_id
+      AND ps2.parent_id != parent_students.parent_id
+    )
+  )
 );
 
 -- Ödevler
@@ -134,9 +164,20 @@ CREATE POLICY "Users can update own profile" ON profiles
 CREATE POLICY "Students can view own data" ON students
   FOR SELECT USING (auth.uid() = id);
 
+CREATE POLICY "Students can update own data" ON students
+  FOR UPDATE USING (auth.uid() = id);
+
 CREATE POLICY "Parents can view children data" ON students
   FOR SELECT USING (id IN (
     SELECT student_id FROM parent_students WHERE parent_id = auth.uid()
+  ));
+
+CREATE POLICY "Teachers can view their students" ON students
+  FOR SELECT USING (id IN (
+    SELECT student_id FROM student_answers sa
+    JOIN assignments a ON sa.assignment_id = a.id
+    JOIN teachers t ON a.teacher_id = t.id
+    WHERE t.id = auth.uid()
   ));
 
 -- Ödev politikaları
@@ -172,10 +213,53 @@ CREATE POLICY "Students can view own roadmap" ON roadmap_steps
     SELECT id FROM analysis_results WHERE student_id = auth.uid()
   ));
 
--- Örnek veriler
+-- Örnek veriler (veri girişi için)
 INSERT INTO tags (name, subject, grade, description) VALUES
   ('kesirler', 'Matematik', 5, 'Kesir işlemleri ve kavramları'),
   ('toplama', 'Matematik', 5, 'Temel toplama işlemleri'),
   ('çıkarma', 'Matematik', 5, 'Temel çıkarma işlemleri'),
   ('fiiller', 'Türkçe', 6, 'Fiil türleri ve çekimleri'),
   ('isimler', 'Türkçe', 6, 'İsim türleri ve özellikleri');
+
+-- Örnek öğrenci verisi
+INSERT INTO profiles (id, email, name, role) VALUES
+  ('550e8400-e29b-41d4-a716-446655440001', 'ahmet.yilmaz@okul.edu.tr', 'Ahmet Yılmaz', 'student'),
+  ('550e8400-e29b-41d4-a716-446655440002', 'fatma.kaya@okul.edu.tr', 'Fatma Kaya', 'student');
+
+INSERT INTO students (id, student_number, first_name, last_name, grade, province, district, school_type, school_name) VALUES
+  ('550e8400-e29b-41d4-a716-446655440001', 'OGR001', 'Ahmet', 'Yılmaz', 5, 'İstanbul', 'Kadıköy', 'ortaokul', 'Kadıköy Ortaokulu'),
+  ('550e8400-e29b-41d4-a716-446655440002', 'OGR002', 'Fatma', 'Kaya', 6, 'Ankara', 'Çankaya', 'ortaokul', 'Çankaya Ortaokulu');
+
+-- Örnek öğretmen verisi
+INSERT INTO profiles (id, email, name, role) VALUES
+  ('550e8400-e29b-41d4-a716-446655440003', 'mehmet.hoca@okul.edu.tr', 'Mehmet Hoca', 'teacher'),
+  ('550e8400-e29b-41d4-a716-446655440004', 'ayse.ogretmen@okul.edu.tr', 'Ayşe Öğretmen', 'teacher');
+
+INSERT INTO teachers (id, teacher_number, first_name, last_name, province, district, school_name, contact_info) VALUES
+  ('550e8400-e29b-41d4-a716-446655440003', 'OGR001', 'Mehmet', 'Hoca', 'İstanbul', 'Kadıköy', 'Kadıköy Ortaokulu', '[{"type": "email", "value": "mehmet.hoca@okul.edu.tr"}, {"type": "phone", "value": "05551234567"}]'),
+  ('550e8400-e29b-41d4-a716-446655440004', 'OGR002', 'Ayşe', 'Öğretmen', 'Ankara', 'Çankaya', 'Çankaya Ortaokulu', '[{"type": "email", "value": "ayse.ogretmen@okul.edu.tr"}, {"type": "phone", "value": "05557654321"}]');
+
+-- Örnek veli verisi
+INSERT INTO profiles (id, email, name, role) VALUES
+  ('550e8400-e29b-41d4-a716-446655440005', 'veli.yilmaz@email.com', 'Veli Yılmaz', 'parent');
+
+INSERT INTO parents (id, first_name, last_name, phone) VALUES
+  ('550e8400-e29b-41d4-a716-446655440005', 'Veli', 'Yılmaz', '05559876543');
+
+-- Veli-Öğrenci ilişkisi
+INSERT INTO parent_students (parent_id, student_id, relationship) VALUES
+  ('550e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440001', 'baba');
+
+-- Örnek ödev
+INSERT INTO assignments (title, description, grade, subject, topic, teacher_id, due_date) VALUES
+  ('Matematik - Kesirler Testi', 'Bu hafta işlediğimiz kesir konularını pekiştirmek için', 5, 'Matematik', 'Kesirler', '550e8400-e29b-41d4-a716-446655440003', NOW() + INTERVAL '7 days');
+
+-- Örnek sorular
+INSERT INTO questions (assignment_id, question, options, correct_answer, tags, difficulty, explanation) VALUES
+  ((SELECT id FROM assignments WHERE title = 'Matematik - Kesirler Testi'),
+   '1/2 + 1/4 = ?',
+   '["2/6", "3/4", "1/6", "2/4"]',
+   1,
+   ARRAY['kesirler', 'toplama'],
+   'easy',
+   '1/2 = 2/4, 2/4 + 1/4 = 3/4');

@@ -34,6 +34,65 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// Admin - Veri Girişi
+app.post('/api/admin/seed-data', async (req, res) => {
+  try {
+    // Örnek öğrenci verisi
+    const { createClient } = require('@supabase/supabase-js');
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+    // Örnek öğrenci
+    const { data: student, error: studentError } = await supabase
+      .from('students')
+      .insert({
+        id: '550e8400-e29b-41d4-a716-446655440006',
+        student_number: 'OGR003',
+        first_name: 'Can',
+        last_name: 'Demir',
+        grade: 7,
+        province: 'İzmir',
+        district: 'Konak',
+        school_type: 'ortaokul',
+        school_name: 'Konak Ortaokulu'
+      })
+      .select();
+
+    if (studentError) throw studentError;
+
+    // Örnek öğretmen
+    const { data: teacher, error: teacherError } = await supabase
+      .from('teachers')
+      .insert({
+        id: '550e8400-e29b-41d4-a716-446655440007',
+        teacher_number: 'OGR003',
+        first_name: 'Ali',
+        last_name: 'Yılmaz',
+        province: 'İzmir',
+        district: 'Konak',
+        school_name: 'Konak Ortaokulu',
+        contact_info: JSON.stringify([
+          { type: 'email', value: 'ali.yilmaz@okul.edu.tr' },
+          { type: 'phone', value: '05551234567' }
+        ])
+      })
+      .select();
+
+    if (teacherError) throw teacherError;
+
+    res.json({
+      success: true,
+      message: 'Örnek veriler eklendi',
+      data: { student, teacher }
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Sample data endpoints
 app.get('/api/assignments', (req, res) => {
   const assignments = [

@@ -110,37 +110,39 @@ body::after {
 
 .bg-icon {
   position: absolute;
-  opacity: 0.08;
+  opacity: 0.16;
   color: #9aa7b2;
   font-size: 64px;
   will-change: transform, opacity;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
 
 /* individual variations */
-.bg-icon.i1 { left: 6%; top: -10vh; font-size: 72px; animation: fall 50s linear infinite; animation-delay: 0s; }
-.bg-icon.i2 { left: 28%; top: -20vh; font-size: 56px; animation: fall 48s linear infinite; animation-delay: 4s; }
-.bg-icon.i3 { left: 50%; top: -15vh; font-size: 64px; animation: fall 55s linear infinite; animation-delay: 6s; }
-.bg-icon.i4 { left: 72%; top: -18vh; font-size: 60px; animation: fall 52s linear infinite; animation-delay: 8s; }
-.bg-icon.i5 { left: 85%; top: -12vh; font-size: 48px; animation: fall 54s linear infinite; animation-delay: 2s; }
-.bg-icon.i6 { left: 40%; top: -8vh; font-size: 68px; animation: fall 60s linear infinite; animation-delay: 10s; }
-.bg-icon.i7 { left: 18%; top: -5vh; font-size: 52px; animation: fall 58s linear infinite; animation-delay: 12s; }
+.bg-icon.i1 { left: 6%; top: -10vh; font-size: 72px; animation-name: floatUp; animation-duration: 40s; animation-delay: -2s; }
+.bg-icon.i2 { left: 28%; top: -20vh; font-size: 56px; animation-name: floatUp; animation-duration: 34s; animation-delay: -6s; }
+.bg-icon.i3 { left: 50%; top: -15vh; font-size: 64px; animation-name: floatUp; animation-duration: 46s; animation-delay: -10s; }
+.bg-icon.i4 { left: 72%; top: -18vh; font-size: 60px; animation-name: floatUp; animation-duration: 38s; animation-delay: -8s; }
+.bg-icon.i5 { left: 85%; top: -12vh; font-size: 48px; animation-name: floatUp; animation-duration: 42s; animation-delay: -4s; }
+.bg-icon.i6 { left: 40%; top: -8vh; font-size: 68px; animation-name: floatUp; animation-duration: 50s; animation-delay: -12s; }
+.bg-icon.i7 { left: 18%; top: -5vh; font-size: 52px; animation-name: floatUp; animation-duration: 48s; animation-delay: -14s; }
 
 /* additional icons for denser flow */
-.bg-icon.i8  { left: 2%;  top: -25vh; font-size: 60px; animation: fall 46s linear infinite; animation-delay: 1s; }
-.bg-icon.i9  { left: 12%; top: -30vh; font-size: 44px; animation: fall 44s linear infinite; animation-delay: 3s; }
-.bg-icon.i10 { left: 22%; top: -22vh; font-size: 70px; animation: fall 50s linear infinite; animation-delay: 5s; }
-.bg-icon.i11 { left: 34%; top: -28vh; font-size: 54px; animation: fall 47s linear infinite; animation-delay: 2s; }
-.bg-icon.i12 { left: 46%; top: -26vh; font-size: 62px; animation: fall 49s linear infinite; animation-delay: 6s; }
-.bg-icon.i13 { left: 58%; top: -30vh; font-size: 50px; animation: fall 45s linear infinite; animation-delay: 4s; }
-.bg-icon.i14 { left: 68%; top: -24vh; font-size: 66px; animation: fall 51s linear infinite; animation-delay: 7s; }
-.bg-icon.i15 { left: 78%; top: -32vh; font-size: 46px; animation: fall 53s linear infinite; animation-delay: 8s; }
-.bg-icon.i16 { left: 88%; top: -20vh; font-size: 58px; animation: fall 52s linear infinite; animation-delay: 9s; }
+.bg-icon.i8  { left: 2%;  top: -25vh; font-size: 60px; animation-name: floatUp; animation-duration: 36s; animation-delay: -3s; }
+.bg-icon.i9  { left: 12%; top: -30vh; font-size: 44px; animation-name: floatUp; animation-duration: 30s; animation-delay: -7s; }
+.bg-icon.i10 { left: 22%; top: -22vh; font-size: 70px; animation-name: floatUp; animation-duration: 44s; animation-delay: -11s; }
+.bg-icon.i11 { left: 34%; top: -28vh; font-size: 54px; animation-name: floatUp; animation-duration: 32s; animation-delay: -2s; }
+.bg-icon.i12 { left: 46%; top: -26vh; font-size: 62px; animation-name: floatUp; animation-duration: 40s; animation-delay: -6s; }
+.bg-icon.i13 { left: 58%; top: -30vh; font-size: 50px; animation-name: floatUp; animation-duration: 34s; animation-delay: -4s; }
+.bg-icon.i14 { left: 68%; top: -24vh; font-size: 66px; animation-name: floatUp; animation-duration: 42s; animation-delay: -8s; }
+.bg-icon.i15 { left: 78%; top: -32vh; font-size: 46px; animation-name: floatUp; animation-duration: 38s; animation-delay: -9s; }
+.bg-icon.i16 { left: 88%; top: -20vh; font-size: 58px; animation-name: floatUp; animation-duration: 46s; animation-delay: -5s; }
 
-@keyframes fall {
-  0% { transform: translateY(0vh) rotate(0deg); opacity: 0.08; }
-  10% { opacity: 0.09; }
-  90% { opacity: 0.04; }
-  100% { transform: translateY(120vh) rotate(360deg); opacity: 0.02; }
+@keyframes floatUp {
+  0% { transform: translateY(120vh) rotate(0deg); opacity: 0.06; }
+  25% { opacity: 0.12; }
+  75% { opacity: 0.12; }
+  100% { transform: translateY(-30vh) rotate(360deg); opacity: 0.06; }
 }
 
 /* Card title accent colors to match their buttons */

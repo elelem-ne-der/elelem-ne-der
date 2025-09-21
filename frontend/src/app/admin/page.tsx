@@ -25,7 +25,10 @@ export default function AdminDashboard() {
     setError('');
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/login`, {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+      console.log('API URL:', apiUrl);
+
+      const response = await fetch(`${apiUrl}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,7 +36,16 @@ export default function AdminDashboard() {
         body: JSON.stringify(loginData),
       });
 
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.log('Error response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+
       const result = await response.json();
+      console.log('Login result:', result);
 
       if (result.success) {
         localStorage.setItem('admin_token', result.token);
@@ -43,7 +55,8 @@ export default function AdminDashboard() {
         setError(result.error || 'Login failed');
       }
     } catch (error) {
-      setError('Connection failed');
+      console.error('Login error:', error);
+      setError(error instanceof Error ? error.message : 'Connection failed');
     } finally {
       setLoading(false);
     }
@@ -73,7 +86,7 @@ export default function AdminDashboard() {
               <input
                 type="text"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                 value={loginData.username}
                 onChange={(e) => setLoginData({...loginData, username: e.target.value})}
                 placeholder="admin"
@@ -87,7 +100,7 @@ export default function AdminDashboard() {
               <input
                 type="password"
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
                 value={loginData.password}
                 onChange={(e) => setLoginData({...loginData, password: e.target.value})}
                 placeholder="••••••••"

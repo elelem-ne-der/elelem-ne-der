@@ -62,7 +62,7 @@ export default function DataEntryPage() {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:3001/api/admin/seed-data', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/seed-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +105,7 @@ export default function DataEntryPage() {
     setMessage('');
 
     try {
-      const response = await fetch('http://localhost:3001/api/admin/seed-data', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/seed-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

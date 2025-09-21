@@ -7,8 +7,28 @@ const { tagQuestion, generateQuestions, analyzeResults } = require('./lib/ai');
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// CORS configuration for production
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Allow localhost for development
+    if (origin.includes('localhost')) return callback(null, true);
+
+    // Allow Vercel domains (for production)
+    if (origin.includes('vercel.app')) return callback(null, true);
+
+    // Allow your custom domain (when you have one)
+    // if (origin.includes('yourdomain.com')) return callback(null, true);
+
+    return callback(new Error('Not allowed by CORS'));
+  },
+  credentials: true
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Admin authentication middleware

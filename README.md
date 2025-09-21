@@ -68,6 +68,31 @@ cd frontend && npm run dev
 
 **🎯 http://localhost:3000** adresinden uygulamaya erişin.
 
+### 4. Vercel'e Deploy
+
+#### Frontend Deploy
+1. [Vercel Dashboard](https://vercel.com) hesabınıza giriş yapın
+2. **New Project** → **Import Git Repository**
+3. Repository'yi seçin ve **Import** edin
+4. **Project Settings** → **Environment Variables** kısmında:
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - `NEXT_PUBLIC_ADMIN_API_KEY`
+   - `NEXT_PUBLIC_API_URL` (Backend URL'iniz)
+
+#### Backend Deploy
+1. Backend klasörüne gidin: `cd backend`
+2. [Vercel CLI](https://vercel.com/cli) yükleyin: `npm i -g vercel`
+3. Login yapın: `vercel login`
+4. Deploy edin: `vercel --prod`
+5. Environment Variables ekleyin:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+   - `SUPABASE_SERVICE_KEY`
+   - `ADMIN_API_KEY`
+
+**🌐 Production URL'lerinizden uygulamaya erişin.**
+
 ## 📊 API Endpoints
 
 ### Temel Endpoints

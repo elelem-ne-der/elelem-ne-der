@@ -33,7 +33,8 @@ export default function BulkImportPage() {
         throw new Error('JSON array formatında olmalı');
       }
 
-      const response = await fetch('http://localhost:3001/api/admin/bulk-import', {
+      // Backend server kontrolü
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/bulk-import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +46,20 @@ export default function BulkImportPage() {
         }),
       });
 
-      const result = await response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`API Hatası (${response.status}): ${errorText}`);
+      }
+
+      let result;
+      const contentType = response.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
+        result = await response.json();
+      } else {
+        const errorText = await response.text();
+        throw new Error(`JSON response bekleniyordu ama HTML geldi: ${errorText.substring(0, 100)}...`);
+      }
+
       setResult(result);
 
     } catch (error) {
@@ -274,7 +288,7 @@ export default function BulkImportPage() {
             value={jsonData}
             onChange={(e) => setJsonData(e.target.value)}
             placeholder={`JSON array formatında ${importType} verilerini girin...`}
-            className="w-full h-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm"
+            className="w-full h-64 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent font-mono text-sm text-gray-900 bg-white"
           />
 
           <div className="mt-4 text-sm text-gray-600">

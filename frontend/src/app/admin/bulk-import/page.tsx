@@ -37,6 +37,7 @@ export default function BulkImportPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
         },
         body: JSON.stringify({
           dataType: importType,

@@ -66,6 +66,7 @@ export default function DataEntryPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
         },
         body: JSON.stringify({
           type: 'student',
@@ -108,6 +109,7 @@ export default function DataEntryPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-api-key': process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
         },
         body: JSON.stringify({
           type: 'teacher',

@@ -11,6 +11,28 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Admin authentication middleware
+const adminAuth = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  const expectedApiKey = process.env.ADMIN_API_KEY;
+
+  if (!expectedApiKey) {
+    return res.status(500).json({
+      success: false,
+      error: 'Admin API key not configured'
+    });
+  }
+
+  if (!apiKey || apiKey !== expectedApiKey) {
+    return res.status(401).json({
+      success: false,
+      error: 'Unauthorized - Invalid API key'
+    });
+  }
+
+  next();
+};
+
 // Routes
 app.get('/', (req, res) => {
   res.json({ message: 'Elelem Ne Der API is running!' });
@@ -35,7 +57,7 @@ app.get('/api/status', (req, res) => {
 });
 
 // Admin - Tekli Veri Girişi
-app.post('/api/admin/seed-data', async (req, res) => {
+app.post('/api/admin/seed-data', adminAuth, async (req, res) => {
   try {
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -161,7 +183,7 @@ app.post('/api/admin/seed-data', async (req, res) => {
 });
 
 // Admin - Toplu Veri Girişi (CSV/JSON)
-app.post('/api/admin/bulk-import', async (req, res) => {
+app.post('/api/admin/bulk-import', adminAuth, async (req, res) => {
   try {
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

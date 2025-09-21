@@ -11,10 +11,19 @@ export default function Home() {
         <i className="fa-solid fa-microscope bg-icon i5" aria-hidden></i>
         <i className="fa-solid fa-superscript bg-icon i6" aria-hidden></i>
         <i className="fa-solid fa-square-root-variable bg-icon i7" aria-hidden></i>
+        <i className="fa-solid fa-book-open bg-icon i8" aria-hidden></i>
+        <i className="fa-solid fa-bookmark bg-icon i9" aria-hidden></i>
+        <i className="fa-brands fa-react bg-icon i10" aria-hidden></i>
+        <i className="fa-solid fa-dna bg-icon i11" aria-hidden></i>
+        <i className="fa-solid fa-microscope bg-icon i12" aria-hidden></i>
+        <i className="fa-solid fa-superscript bg-icon i13" aria-hidden></i>
+        <i className="fa-solid fa-square-root-variable bg-icon i14" aria-hidden></i>
+        <i className="fa-solid fa-book-open bg-icon i15" aria-hidden></i>
+        <i className="fa-solid fa-bookmark bg-icon i16" aria-hidden></i>
       </div>
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl font-bold text-white mb-6">
             Elelem Ne Der
           </h1>
           <p className="text-xl text-gray-600 mb-8">

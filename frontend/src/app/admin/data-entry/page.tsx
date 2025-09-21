@@ -62,11 +62,17 @@ export default function DataEntryPage() {
     setMessage('');
 
     try {
+      const token = localStorage.getItem('admin_token');
+      if (!token) {
+        setMessage('❌ Giriş yapmanız gerekiyor');
+        return;
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/seed-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           type: 'student',
@@ -105,11 +111,17 @@ export default function DataEntryPage() {
     setMessage('');
 
     try {
+      const token = localStorage.getItem('admin_token');
+      if (!token) {
+        setMessage('❌ Giriş yapmanız gerekiyor');
+        return;
+      }
+
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/seed-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           type: 'teacher',

@@ -1,5 +1,7 @@
 const express = require('express');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const supabase = require('./lib/supabase');
 const { tagQuestion, generateQuestions, analyzeResults } = require('./lib/ai');
@@ -31,7 +33,32 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 
-// Admin authentication middleware
+// JWT authentication middleware
+const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+  if (!token) {
+    return res.status(401).json({
+      success: false,
+      error: 'Access token required'
+    });
+  }
+
+  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key', (err, user) => {
+    if (err) {
+      return res.status(403).json({
+        success: false,
+        error: 'Invalid or expired token'
+      });
+    }
+
+    req.user = user;
+    next();
+  });
+};
+
+// Legacy API key middleware (for backward compatibility)
 const adminAuth = (req, res, next) => {
   const apiKey = req.headers['x-api-key'];
   const expectedApiKey = process.env.ADMIN_API_KEY;
@@ -76,8 +103,45 @@ app.get('/api/status', (req, res) => {
   });
 });
 
+// Admin Login
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    // Simple admin credentials (you can change these)
+    const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin123';
+
+    if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      // Generate JWT token
+      const token = jwt.sign(
+        { username: ADMIN_USERNAME, role: 'admin' },
+        process.env.JWT_SECRET || 'your-secret-key',
+        { expiresIn: '24h' }
+      );
+
+      res.json({
+        success: true,
+        message: 'Login successful',
+        token: token,
+        user: { username: ADMIN_USERNAME, role: 'admin' }
+      });
+    } else {
+      res.status(401).json({
+        success: false,
+        error: 'Invalid credentials'
+      });
+    }
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Admin - Tekli Veri Girişi
-app.post('/api/admin/seed-data', adminAuth, async (req, res) => {
+app.post('/api/admin/seed-data', authenticateToken, async (req, res) => {
   try {
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -203,7 +267,7 @@ app.post('/api/admin/seed-data', adminAuth, async (req, res) => {
 });
 
 // Admin - Toplu Veri Girişi (CSV/JSON)
-app.post('/api/admin/bulk-import', adminAuth, async (req, res) => {
+app.post('/api/admin/bulk-import', authenticateToken, async (req, res) => {
   try {
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);

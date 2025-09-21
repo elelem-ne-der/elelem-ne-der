@@ -66,7 +66,7 @@ cd backend && npm run dev
 cd frontend && npm run dev
 ```
 
-**🎯 http://localhost:3000** adresinden uygulamaya erişin.
+**🎯 Production URL'lerinizden uygulamaya erişin.**
 
 ### 4. Vercel'e Deploy
 
@@ -89,7 +89,9 @@ cd frontend && npm run dev
    - `SUPABASE_URL`
    - `SUPABASE_ANON_KEY`
    - `SUPABASE_SERVICE_KEY`
-   - `ADMIN_API_KEY`
+   - `ADMIN_USERNAME`
+   - `ADMIN_PASSWORD`
+   - `JWT_SECRET`
 
 **🌐 Production URL'lerinizden uygulamaya erişin.**
 
@@ -112,7 +114,7 @@ elelem-ne-der/
 ├── frontend/          # Next.js uygulaması
 ├── backend/           # Express.js API
 ├── schema.sql         # Veritabanı şeması
-└── PROJE_DOKUMANTASYONU.md  # Detaylı dokümantasyon
+└── project-documentation.md  # Detaylı dokümantasyon
 ```
 
 ## 🤝 Katkıda Bulunma
@@ -134,4 +136,4 @@ Bu proje eğitim amaçlı geliştirilmiştir.
 
 ---
 
-**🚀 Proje hazır! Detaylar için [PROJE_DOKUMANTASYONU.md](PROJE_DOKUMANTASYONU.md) dosyasına bakın.**
+**🚀 Proje hazır! Detaylar için [project-documentation.md](project-documentation.md) dosyasına bakın.**

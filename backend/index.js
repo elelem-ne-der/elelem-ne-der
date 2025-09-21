@@ -406,23 +406,52 @@ app.post('/api/admin/bulk-import', authenticateToken, async (req, res) => {
     if (dataType === 'students') {
       for (const student of data) {
         try {
-          // Geçici olarak auth user creation'ı bypass et (auth.users RLS sorunu nedeniyle)
+          // Service role ile auth user oluştur
           const userId = require('crypto').randomUUID();
-          console.log('Creating student without auth user due to RLS issue, ID:', userId);
-
-          // Profile oluştur - auth_user_id olmadan
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              id: userId,
-              email: student.email || `${student.student_number}@student.example.com`,
-              name: `${student.first_name} ${student.last_name}`,
+          console.log('Creating student with auth user, ID:', userId);
+          
+          // Auth user oluştur (Service role ile)
+          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+            id: userId,
+            email: student.email || `${student.student_number}@student.example.com`,
+            password: 'TempPass123!',
+            user_metadata: {
+              full_name: `${student.first_name} ${student.last_name}`,
               role: 'student'
-            })
-            .select()
-            .single();
+            }
+          });
 
-          if (profileError) throw profileError;
+          if (authError) {
+            console.error('Auth error for student:', student.student_number, authError);
+            // Auth user oluşturulamazsa sadece profile oluştur
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .insert({
+                id: userId,
+                email: student.email || `${student.student_number}@student.example.com`,
+                name: `${student.first_name} ${student.last_name}`,
+                role: 'student'
+              })
+              .select()
+              .single();
+
+            if (profileError) throw profileError;
+          } else {
+            // Auth user başarıyla oluşturuldu, profile oluştur
+            const { data: profile, error: profileError } = await supabase
+              .from('profiles')
+              .insert({
+                id: userId,
+                auth_user_id: authUser.user.id,
+                email: authUser.user.email,
+                name: `${student.first_name} ${student.last_name}`,
+                role: 'student'
+              })
+              .select()
+              .single();
+
+            if (profileError) throw profileError;
+          }
 
           // Önce district'i bul veya oluştur
           const { data: district, error: districtError } = await supabase

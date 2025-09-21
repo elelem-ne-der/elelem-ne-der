@@ -108,6 +108,30 @@ body::after {
   z-index: 0;
 }
 
+/* container for JS-generated icon stream */
+.icon-stream {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.stream-icon {
+  position: absolute;
+  top: -30vh;
+  transform-origin: center;
+  animation-name: streamDown;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes streamDown {
+  0% { transform: translateY(-30vh) rotate(0deg); opacity: 0.06; }
+  50% { opacity: 0.18; }
+  100% { transform: translateY(130vh) rotate(360deg); opacity: 0.06; }
+}
+
 .bg-icon {
   position: absolute;
   opacity: 0.16;
@@ -154,4 +178,14 @@ body::after {
 }
 .card-title-parent {
   color: #7c3aed; /* purple-600 */
+}
+
+/* interactive card hover effect */
+.interactive-card {
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+.interactive-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  border-color: rgba(255,255,255,0.06);
 }

@@ -1,8 +1,10 @@
 import Link from 'next/link';
+import IconStream from '@/components/IconStream';
 
 export default function Home() {
   return (
     <div className="min-h-screen animated-bg relative">
+      <IconStream />
       <div className="bg-icons" aria-hidden>
         <i className="fa-solid fa-book-open bg-icon i1" aria-hidden></i>
         <i className="fa-solid fa-bookmark bg-icon i2" aria-hidden></i>
@@ -46,7 +48,7 @@ export default function Home() {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card">
               <div className="text-4xl mb-4">👨‍🎓</div>
               <h3 className="text-2xl font-semibold mb-4 card-title-student">Öğrenci</h3>
               <p className="text-gray-600 mb-6">
@@ -68,7 +70,7 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card">
               <div className="text-4xl mb-4">👨‍🏫</div>
               <h3 className="text-2xl font-semibold mb-4 card-title-teacher">Öğretmen</h3>
               <p className="text-gray-600 mb-6">
@@ -90,7 +92,7 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow-lg p-8">
+            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card">
               <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
               <h3 className="text-2xl font-semibold mb-4 card-title-parent">Veli</h3>
               <p className="text-gray-600 mb-6">

@@ -406,27 +406,16 @@ app.post('/api/admin/bulk-import', authenticateToken, async (req, res) => {
     if (dataType === 'students') {
       for (const student of data) {
         try {
-          // Auth kullanıcısı oluştur
+          // Geçici olarak auth user creation'ı bypass et (auth.users RLS sorunu nedeniyle)
           const userId = require('crypto').randomUUID();
-          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
-            id: userId,
-            email: student.email || `${student.student_number}@student.example.com`,
-            password: 'TempPass123!',
-            user_metadata: {
-              full_name: `${student.first_name} ${student.last_name}`,
-              role: 'student'
-            }
-          });
+          console.log('Creating student without auth user due to RLS issue, ID:', userId);
 
-          if (authError) throw authError;
-
-          // Profile oluştur
+          // Profile oluştur - auth_user_id olmadan
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .insert({
               id: userId,
-              auth_user_id: userId,
-              email: authUser.user.email,
+              email: student.email || `${student.student_number}@student.example.com`,
               name: `${student.first_name} ${student.last_name}`,
               role: 'student'
             })

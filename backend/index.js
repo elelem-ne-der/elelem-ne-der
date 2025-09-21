@@ -43,19 +43,19 @@ app.post('/api/admin/seed-data', async (req, res) => {
     const { type, data } = req.body;
 
     if (type === 'student') {
-      // Önce profile oluştur
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          auth_user_id: require('crypto').randomUUID(), // Service role ile oluşturuyoruz
-          email: data.email || `${data.student_number}@student.example.com`,
-          name: `${data.first_name} ${data.last_name}`,
+      // Önce auth.users'a kullanıcı oluştur (Service Role ile)
+      const userId = require('crypto').randomUUID();
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        id: userId,
+        email: data.email || `${data.student_number}@student.example.com`,
+        password: 'TempPass123!', // Geçici şifre, kullanıcı giriş yapınca değiştirebilir
+        user_metadata: {
+          full_name: `${data.first_name} ${data.last_name}`,
           role: 'student'
-        })
-        .select()
-        .single();
+        }
+      });
 
-      if (profileError) throw profileError;
+      if (authError) throw authError;
 
       // Okul bilgilerini al (varsayılan okul oluştur)
       const { data: school, error: schoolError } = await supabase
@@ -75,7 +75,7 @@ app.post('/api/admin/seed-data', async (req, res) => {
       const { data: student, error: studentError } = await supabase
         .from('students')
         .insert({
-          id: profile.id,
+          id: userId, // auth.users'dan gelen ID
           student_number: data.student_number,
           first_name: data.first_name,
           last_name: data.last_name,
@@ -95,19 +95,19 @@ app.post('/api/admin/seed-data', async (req, res) => {
       });
 
     } else if (type === 'teacher') {
-      // Önce profile oluştur
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .insert({
-          auth_user_id: require('crypto').randomUUID(), // Service role ile oluşturuyoruz
-          email: data.email || `${data.teacher_number}@teacher.example.com`,
-          name: `${data.first_name} ${data.last_name}`,
+      // Önce auth.users'a kullanıcı oluştur (Service Role ile)
+      const userId = require('crypto').randomUUID();
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        id: userId,
+        email: data.email || `${data.teacher_number}@teacher.example.com`,
+        password: 'TempPass123!', // Geçici şifre, kullanıcı giriş yapınca değiştirebilir
+        user_metadata: {
+          full_name: `${data.first_name} ${data.last_name}`,
           role: 'teacher'
-        })
-        .select()
-        .single();
+        }
+      });
 
-      if (profileError) throw profileError;
+      if (authError) throw authError;
 
       // Okul bilgilerini al (varsayılan okul oluştur)
       const { data: school, error: schoolError } = await supabase
@@ -127,7 +127,7 @@ app.post('/api/admin/seed-data', async (req, res) => {
       const { data: teacher, error: teacherError } = await supabase
         .from('teachers')
         .insert({
-          id: profile.id,
+          id: userId, // auth.users'dan gelen ID
           teacher_number: data.teacher_number,
           first_name: data.first_name,
           last_name: data.last_name,
@@ -178,19 +178,19 @@ app.post('/api/admin/bulk-import', async (req, res) => {
     if (dataType === 'students') {
       for (const student of data) {
         try {
-          // Profile oluştur
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              auth_user_id: require('crypto').randomUUID(),
-              email: student.email || `${student.student_number}@student.example.com`,
-              name: `${student.first_name} ${student.last_name}`,
+          // Auth kullanıcısı oluştur
+          const userId = require('crypto').randomUUID();
+          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+            id: userId,
+            email: student.email || `${student.student_number}@student.example.com`,
+            password: 'TempPass123!',
+            user_metadata: {
+              full_name: `${student.first_name} ${student.last_name}`,
               role: 'student'
-            })
-            .select()
-            .single();
+            }
+          });
 
-          if (profileError) throw profileError;
+          if (authError) throw authError;
 
           // Okul bilgilerini al
           const { data: school, error: schoolError } = await supabase
@@ -210,7 +210,7 @@ app.post('/api/admin/bulk-import', async (req, res) => {
           const { data: result, error } = await supabase
             .from('students')
             .insert({
-              id: profile.id,
+              id: userId, // auth.users'dan gelen ID
               student_number: student.student_number,
               first_name: student.first_name,
               last_name: student.last_name,
@@ -232,19 +232,19 @@ app.post('/api/admin/bulk-import', async (req, res) => {
     } else if (dataType === 'teachers') {
       for (const teacher of data) {
         try {
-          // Profile oluştur
-          const { data: profile, error: profileError } = await supabase
-            .from('profiles')
-            .insert({
-              auth_user_id: require('crypto').randomUUID(),
-              email: teacher.email || `${teacher.teacher_number}@teacher.example.com`,
-              name: `${teacher.first_name} ${teacher.last_name}`,
+          // Auth kullanıcısı oluştur
+          const userId = require('crypto').randomUUID();
+          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+            id: userId,
+            email: teacher.email || `${teacher.teacher_number}@teacher.example.com`,
+            password: 'TempPass123!',
+            user_metadata: {
+              full_name: `${teacher.first_name} ${teacher.last_name}`,
               role: 'teacher'
-            })
-            .select()
-            .single();
+            }
+          });
 
-          if (profileError) throw profileError;
+          if (authError) throw authError;
 
           // Okul bilgilerini al
           const { data: school, error: schoolError } = await supabase
@@ -264,7 +264,7 @@ app.post('/api/admin/bulk-import', async (req, res) => {
           const { data: result, error } = await supabase
             .from('teachers')
             .insert({
-              id: profile.id,
+              id: userId, // auth.users'dan gelen ID
               teacher_number: teacher.teacher_number,
               first_name: teacher.first_name,
               last_name: teacher.last_name,

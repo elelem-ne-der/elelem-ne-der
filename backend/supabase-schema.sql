@@ -18,10 +18,7 @@ CREATE TABLE students (
   last_name TEXT NOT NULL, -- Soyad (zorunlu)
   middle_name TEXT, -- Orta isim (isteğe bağlı)
   grade INTEGER NOT NULL CHECK (grade >= 5 AND grade <= 12), -- 5-12. sınıf arası
-  province TEXT NOT NULL, -- İl (zorunlu)
-  district TEXT NOT NULL, -- İlçe (zorunlu)
-  school_type TEXT NOT NULL CHECK (school_type IN ('ortaokul', 'lise')), -- Okul türü
-  school_name TEXT NOT NULL, -- Okul adı (zorunlu)
+  school_id UUID REFERENCES schools(id) NOT NULL, -- Okul foreign key
   parent_id UUID REFERENCES profiles(id), -- Maksimum 1 veli
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -34,9 +31,7 @@ CREATE TABLE teachers (
   first_name TEXT NOT NULL, -- Ad (zorunlu)
   last_name TEXT NOT NULL, -- Soyad (zorunlu)
   middle_name TEXT, -- Orta isim (isteğe bağlı)
-  province TEXT NOT NULL, -- İl (zorunlu)
-  district TEXT NOT NULL, -- İlçe (zorunlu)
-  school_name TEXT NOT NULL, -- Okul adı (zorunlu)
+  school_id UUID REFERENCES schools(id) NOT NULL, -- Okul foreign key
   contact_info JSONB NOT NULL CHECK (jsonb_array_length(contact_info) >= 1), -- En az 1 mail/telefon
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -66,6 +61,36 @@ CREATE TABLE parent_students (
       AND ps2.parent_id != parent_students.parent_id
     )
   )
+);
+
+-- İller tablosu
+CREATE TABLE provinces (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- İlçeler tablosu
+CREATE TABLE districts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  province_id UUID REFERENCES provinces(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(province_id, name)
+);
+
+-- Okullar tablosu
+CREATE TABLE schools (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  district_id UUID REFERENCES districts(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  level TEXT NOT NULL CHECK (level IN ('anaokulu', 'ilkokul', 'ortaokul', 'lise', 'üniversite')),
+  type TEXT, -- resmi/özel
+  address TEXT,
+  phone TEXT,
+  email TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Ödevler
@@ -147,6 +172,9 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE teachers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE parents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE provinces ENABLE ROW LEVEL SECURITY;
+ALTER TABLE districts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE schools ENABLE ROW LEVEL SECURITY;
 ALTER TABLE assignments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE student_answers ENABLE ROW LEVEL SECURITY;
@@ -212,6 +240,26 @@ CREATE POLICY "Students can view own roadmap" ON roadmap_steps
   FOR SELECT USING (analysis_id IN (
     SELECT id FROM analysis_results WHERE student_id = auth.uid()
   ));
+
+-- Okul politikaları (tüm authenticated kullanıcılar görebilir)
+CREATE POLICY "Authenticated users can view provinces" ON provinces
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can view districts" ON districts
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can view schools" ON schools
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+-- Admin politikaları (veri girişi için)
+CREATE POLICY "Service role can insert provinces" ON provinces
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Service role can insert districts" ON districts
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Service role can insert schools" ON schools
+  FOR INSERT WITH CHECK (true);
 
 -- Örnek veriler (veri girişi için)
 INSERT INTO tags (name, subject, grade, description) VALUES

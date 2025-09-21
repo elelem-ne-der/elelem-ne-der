@@ -21,12 +21,18 @@ export default function Home() {
             AI destekli kişiselleştirilmiş öğrenme platformu
           </p>
           
-          <div className="mb-12">
+          <div className="mb-12 flex space-x-4 justify-center">
             <a
               href="/test"
               className="bg-gray-600 text-white px-6 py-3 rounded-lg hover:bg-gray-700 transition"
             >
               🔧 Test Sayfası
+            </a>
+            <a
+              href="/admin"
+              className="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition"
+            >
+              ⚙️ Admin Paneli
             </a>
           </div>
           

@@ -43,21 +43,48 @@ app.post('/api/admin/seed-data', async (req, res) => {
     const { type, data } = req.body;
 
     if (type === 'student') {
+      // Önce profile oluştur
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          auth_user_id: require('crypto').randomUUID(), // Service role ile oluşturuyoruz
+          email: data.email || `${data.student_number}@student.example.com`,
+          name: `${data.first_name} ${data.last_name}`,
+          role: 'student'
+        })
+        .select()
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Okul bilgilerini al (varsayılan okul oluştur)
+      const { data: school, error: schoolError } = await supabase
+        .from('schools')
+        .insert({
+          district_id: data.district_id, // Frontend'den district_id gelmeli
+          name: data.school_name,
+          level: 'ilkokul', // Varsayılan
+          type: 'resmi'
+        })
+        .select()
+        .single();
+
+      if (schoolError) throw schoolError;
+
+      // Öğrenci oluştur
       const { data: student, error: studentError } = await supabase
         .from('students')
         .insert({
-          id: require('crypto').randomUUID(),
+          id: profile.id,
           student_number: data.student_number,
           first_name: data.first_name,
           last_name: data.last_name,
           middle_name: data.middle_name || null,
           grade: parseInt(data.grade),
-          province: data.province,
-          district: data.district,
-          school_type: data.school_type,
-          school_name: data.school_name
+          school_id: school.id
         })
-        .select();
+        .select()
+        .single();
 
       if (studentError) throw studentError;
 
@@ -68,23 +95,51 @@ app.post('/api/admin/seed-data', async (req, res) => {
       });
 
     } else if (type === 'teacher') {
+      // Önce profile oluştur
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .insert({
+          auth_user_id: require('crypto').randomUUID(), // Service role ile oluşturuyoruz
+          email: data.email || `${data.teacher_number}@teacher.example.com`,
+          name: `${data.first_name} ${data.last_name}`,
+          role: 'teacher'
+        })
+        .select()
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Okul bilgilerini al (varsayılan okul oluştur)
+      const { data: school, error: schoolError } = await supabase
+        .from('schools')
+        .insert({
+          district_id: data.district_id, // Frontend'den district_id gelmeli
+          name: data.school_name,
+          level: 'ilkokul', // Varsayılan
+          type: 'resmi'
+        })
+        .select()
+        .single();
+
+      if (schoolError) throw schoolError;
+
+      // Öğretmen oluştur
       const { data: teacher, error: teacherError } = await supabase
         .from('teachers')
         .insert({
-          id: require('crypto').randomUUID(),
+          id: profile.id,
           teacher_number: data.teacher_number,
           first_name: data.first_name,
           last_name: data.last_name,
           middle_name: data.middle_name || null,
-          province: data.province,
-          district: data.district,
-          school_name: data.school_name,
+          school_id: school.id,
           contact_info: JSON.stringify([
             { type: 'email', value: data.contact_email },
             { type: 'phone', value: data.contact_phone }
           ])
         })
-        .select();
+        .select()
+        .single();
 
       if (teacherError) throw teacherError;
 
@@ -123,19 +178,45 @@ app.post('/api/admin/bulk-import', async (req, res) => {
     if (dataType === 'students') {
       for (const student of data) {
         try {
+          // Profile oluştur
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              auth_user_id: require('crypto').randomUUID(),
+              email: student.email || `${student.student_number}@student.example.com`,
+              name: `${student.first_name} ${student.last_name}`,
+              role: 'student'
+            })
+            .select()
+            .single();
+
+          if (profileError) throw profileError;
+
+          // Okul bilgilerini al
+          const { data: school, error: schoolError } = await supabase
+            .from('schools')
+            .insert({
+              district_id: student.district_id, // Frontend'den gelmeli
+              name: student.school_name,
+              level: 'ilkokul',
+              type: 'resmi'
+            })
+            .select()
+            .single();
+
+          if (schoolError) throw schoolError;
+
+          // Öğrenci oluştur
           const { data: result, error } = await supabase
             .from('students')
             .insert({
-              id: require('crypto').randomUUID(),
+              id: profile.id,
               student_number: student.student_number,
               first_name: student.first_name,
               last_name: student.last_name,
               middle_name: student.middle_name || null,
               grade: parseInt(student.grade),
-              province: student.province,
-              district: student.district,
-              school_type: student.school_type,
-              school_name: student.school_name
+              school_id: school.id
             })
             .select();
 
@@ -151,17 +232,44 @@ app.post('/api/admin/bulk-import', async (req, res) => {
     } else if (dataType === 'teachers') {
       for (const teacher of data) {
         try {
+          // Profile oluştur
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .insert({
+              auth_user_id: require('crypto').randomUUID(),
+              email: teacher.email || `${teacher.teacher_number}@teacher.example.com`,
+              name: `${teacher.first_name} ${teacher.last_name}`,
+              role: 'teacher'
+            })
+            .select()
+            .single();
+
+          if (profileError) throw profileError;
+
+          // Okul bilgilerini al
+          const { data: school, error: schoolError } = await supabase
+            .from('schools')
+            .insert({
+              district_id: teacher.district_id, // Frontend'den gelmeli
+              name: teacher.school_name,
+              level: 'ilkokul',
+              type: 'resmi'
+            })
+            .select()
+            .single();
+
+          if (schoolError) throw schoolError;
+
+          // Öğretmen oluştur
           const { data: result, error } = await supabase
             .from('teachers')
             .insert({
-              id: require('crypto').randomUUID(),
+              id: profile.id,
               teacher_number: teacher.teacher_number,
               first_name: teacher.first_name,
               last_name: teacher.last_name,
               middle_name: teacher.middle_name || null,
-              province: teacher.province,
-              district: teacher.district,
-              school_name: teacher.school_name,
+              school_id: school.id,
               contact_info: JSON.stringify([
                 { type: 'email', value: teacher.contact_email },
                 { type: 'phone', value: teacher.contact_phone }

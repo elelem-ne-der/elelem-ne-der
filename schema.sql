@@ -167,6 +167,8 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE teachers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE parents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE parent_students ENABLE ROW LEVEL SECURITY;
+ALTER TABLE tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE provinces ENABLE ROW LEVEL SECURITY;
 ALTER TABLE districts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE schools ENABLE ROW LEVEL SECURITY;
@@ -210,6 +212,18 @@ CREATE POLICY "Teachers can view own data" ON teachers
 CREATE POLICY "Teachers can update own data" ON teachers
   FOR UPDATE USING (auth.uid() = id);
 
+-- Veli politikaları
+CREATE POLICY "Parents can view own data" ON parents
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Parents can update own data" ON parents
+  FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "Students can view their parents" ON parents
+  FOR SELECT USING (id IN (
+    SELECT parent_id FROM parent_students WHERE student_id = auth.uid()
+  ));
+
 -- Ödev politikaları
 CREATE POLICY "Teachers can view own assignments" ON assignments
   FOR SELECT USING (teacher_id = auth.uid());
@@ -243,6 +257,25 @@ CREATE POLICY "Students can view own roadmap" ON roadmap_steps
     SELECT id FROM analysis_results WHERE student_id = auth.uid()
   ));
 
+-- Veli-Öğrenci ilişki politikaları
+CREATE POLICY "Parents can view own parent-student relationships" ON parent_students
+  FOR SELECT USING (parent_id = auth.uid());
+
+CREATE POLICY "Students can view own parent-student relationships" ON parent_students
+  FOR SELECT USING (student_id = auth.uid());
+
+CREATE POLICY "Service role can insert parent-student relationships" ON parent_students
+  FOR INSERT WITH CHECK (true);
+
+-- Etiket politikaları
+CREATE POLICY "Authenticated users can view tags" ON tags
+  FOR SELECT USING (auth.role() = 'authenticated');
+
+CREATE POLICY "Teachers can insert tags" ON tags
+  FOR INSERT WITH CHECK (auth.uid() = (
+    SELECT id FROM teachers WHERE id = auth.uid()
+  ));
+
 -- Okul politikaları (tüm authenticated kullanıcılar görebilir)
 CREATE POLICY "Authenticated users can view provinces" ON provinces
   FOR SELECT USING (auth.role() = 'authenticated');
@@ -267,6 +300,7 @@ CREATE POLICY "Service role can insert schools" ON schools
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
+  SET search_path = public;
   INSERT INTO public.profiles (auth_user_id, email, name, role)
   VALUES (
     NEW.id,
@@ -287,6 +321,7 @@ CREATE TRIGGER on_auth_user_created
 CREATE OR REPLACE FUNCTION check_one_parent_per_student()
 RETURNS TRIGGER AS $$
 BEGIN
+  SET search_path = public;
   -- Aynı öğrenciye başka bir veli atanmış mı kontrol et
   IF EXISTS (
     SELECT 1 FROM parent_students

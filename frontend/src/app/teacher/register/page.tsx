@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 interface RegisterForm {
-  firstName: string;
-  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -18,8 +17,6 @@ interface RegisterForm {
 
 export default function TeacherRegister() {
   const [formData, setFormData] = useState<RegisterForm>({
-    firstName: '',
-    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -40,7 +37,7 @@ export default function TeacherRegister() {
 
     try {
       // Form validation
-      if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.subject) {
+      if (!formData.email || !formData.password || !formData.subject) {
         throw new Error('Lütfen zorunlu alanları doldurun');
       }
 
@@ -58,8 +55,21 @@ export default function TeacherRegister() {
         throw new Error('Geçerli bir e-posta adresi girin');
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Supabase auth ile kayıt
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.email.split('@')[0], // Email'in @'dan önceki kısmı
+            role: 'teacher'
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
 
       setSuccess(true);
 

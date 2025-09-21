@@ -1,1 +1,0 @@
-## Pupilica AI Hackathon

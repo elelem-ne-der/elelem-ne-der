@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ParentLogin() {
   const [formData, setFormData] = useState({
@@ -11,6 +12,7 @@ export default function ParentLogin() {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -19,20 +21,8 @@ export default function ParentLogin() {
     setError('');
 
     try {
-      // Demo login - gerçek uygulamada API call yapılacak
-      if (formData.email && formData.password) {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        // Demo success - veli olarak giriş yapıldı
-        localStorage.setItem('userRole', 'parent');
-        localStorage.setItem('parentName', 'Mehmet Yılmaz');
-        localStorage.setItem('parentEmail', formData.email);
-
-        router.push('/parent/dashboard');
-      } else {
-        setError('Lütfen tüm alanları doldurun');
-      }
+      await signIn(formData.email, formData.password);
+      router.push('/parent/dashboard');
     } catch (error) {
       setError('Giriş yapılırken bir hata oluştu');
     } finally {
@@ -72,7 +62,7 @@ export default function ParentLogin() {
                 autoComplete="email"
                 required
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="E-posta adresi"
+                placeholder="E-posta adresinizi girin"
                 value={formData.email}
                 onChange={handleChange}
               />

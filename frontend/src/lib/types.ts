@@ -76,6 +76,7 @@ export interface RoadmapStep {
   resources: string[];
   estimated_time: number; // minutes
   completed: boolean;
+  created_at: string;
 }
 
 export interface Tag {
@@ -84,4 +85,38 @@ export interface Tag {
   subject: string;
   grade: number;
   description?: string;
+  created_at: string;
+}
+
+// Database tabloları için ek tipler
+export interface Province {
+  id: string;
+  name: string;
+  created_at: string;
+}
+
+export interface District {
+  id: string;
+  name: string;
+  province_id: string;
+  created_at: string;
+}
+
+export interface School {
+  id: string;
+  name: string;
+  level: 'anaokulu' | 'ilkokul' | 'ortaokul' | 'lise' | 'üniversite';
+  type?: string;
+  address?: string;
+  phone?: string;
+  email?: string;
+  district_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ParentStudentRelationship {
+  parent_id: string;
+  student_id: string;
+  relationship: string;
 }

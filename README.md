@@ -1,164 +1,112 @@
-# Elelem Ne Der - AI Destekli Öğrenme Platformu
+# Elelem Ne Der - AI Destekli Eğitim Platformu
 
-## Proje Hakkında
+## 📋 Proje Hakkında
 
-Elelem Ne Der, 5-12. sınıf öğrencileri için tasarlanmış AI destekli kişiselleştirilmiş öğrenme platformudur. Platform, öğrencilerin hatalarını analiz ederek kök nedenleri bulur ve kişiselleştirilmiş öğrenme yol haritaları oluşturur.
+**Elelem Ne Der**, 5-12. sınıf Türk öğrencileri için tasarlanmış yapay zeka destekli kişiselleştirilmiş öğrenme platformudur. Platform, öğrencilerin hatalarını analiz ederek kök nedenleri bulur ve özel öğrenme yol haritaları oluşturur.
 
-## Özellikler
+### 🎯 Temel Özellikler
 
-### 🎯 Ana Özellikler
 - **AI Destekli Soru Etiketleme**: Sorular otomatik olarak konu ve zorluk seviyesine göre etiketlenir
 - **Akıllı Hata Analizi**: Öğrenci hatalarını analiz ederek temel eksiklikleri tespit eder
 - **Kişiselleştirilmiş Yol Haritası**: Her öğrenci için özel öğrenme planı oluşturur
 - **Çoklu Kullanıcı Desteği**: Öğrenci, Öğretmen ve Veli rolleri
 
 ### 👥 Kullanıcı Rolleri
-- **Öğrenci**: Ödevleri çözer, ilerlemesini takip eder
-- **Öğretmen**: Ödev oluşturur, öğrenci ilerlemesini izler
-- **Veli**: Çocuğunun gelişimini takip eder
 
-## Teknoloji Yığını
+| Rol | Yetkiler | Özellikler |
+|-----|----------|------------|
+| **Öğrenci** | Ödev çözme, ilerleme takibi | Kişisel dashboard, AI analiz sonuçları |
+| **Öğretmen** | Ödev oluşturma, öğrenci takibi | Sınıf yönetimi, rapor görüntüleme |
+| **Veli** | Çocuk takibi | Performans raporları, gelişim takibi |
+
+
+## 🛠️ Teknoloji Yığını
 
 ### Frontend
 - **Next.js 15** - React framework
 - **TypeScript** - Tip güvenliği
 - **Tailwind CSS** - Styling
-- **Supabase Client** - Veritabanı bağlantısı
 
 ### Backend
 - **Node.js** - Runtime
 - **Express.js** - Web framework
-- **Supabase** - PostgreSQL veritabanı ve auth
-- **Hugging Face** - AI servisleri
+- **Supabase** - Database & Auth
 
-### Deployment
-- **Vercel** - Frontend ve Backend hosting
+### AI & Deployment
+- **Hugging Face** - AI servisleri (ücretsiz)
+- **Vercel** - Hosting platformu
 
-## Kurulum
+## 🚀 Hızlı Başlangıç
 
 ### Gereksinimler
 - Node.js 18+
-- npm veya yarn
 - Supabase hesabı
-- Hugging Face API anahtarı (opsiyonel)
 
-### 1. Repository'yi klonlayın
+### 1. Kurulum
 ```bash
-git clone <repository-url>
-cd elelem-ne-der
+# Backend
+cd backend && npm install
+
+# Frontend
+cd frontend && npm install
 ```
 
-### 2. Backend Kurulumu
-```bash
-cd backend
-npm install
-cp env.example .env
-# .env dosyasını düzenleyin
-npm run dev
-```
-
-### 3. Frontend Kurulumu
-```bash
-cd frontend
-npm install
-cp env.local.example .env.local
-# .env.local dosyasını düzenleyin
-npm run dev
-```
-
-### 4. Supabase Kurulumu
+### 2. Supabase Kurulumu
 1. [Supabase](https://supabase.com) hesabı oluşturun
 2. Yeni proje oluşturun
-3. `backend/supabase-schema.sql` dosyasını SQL Editor'de çalıştırın
-4. API anahtarlarını `.env` dosyalarına ekleyin
+3. `schema.sql` dosyasını SQL Editor'de çalıştırın
+4. API anahtarlarını environment dosyalarına ekleyin
 
-## API Endpoints
+### 3. Çalıştırma
+```bash
+# Terminal 1 - Backend
+cd backend && npm run dev
+
+# Terminal 2 - Frontend
+cd frontend && npm run dev
+```
+
+**🎯 http://localhost:3000** adresinden uygulamaya erişin.
+
+## 📊 API Endpoints
 
 ### Temel Endpoints
 - `GET /api/assignments` - Ödev listesi
 - `GET /api/questions/:assignmentId` - Soru listesi
-- `POST /api/tag-question` - Soru etiketleme
-- `POST /api/generate-questions` - Yeni soru üretimi
-- `POST /api/analyze-results` - Hata analizi
+- `GET /api/status` - Sistem durumu
 
 ### AI Endpoints
 - `POST /api/tag-question` - Soru etiketleme
 - `POST /api/generate-questions` - Soru üretimi
-- `POST /api/analyze-results` - Sonuç analizi
+- `POST /api/analyze-results` - Hata analizi
 
-## Proje Yapısı
+## 📁 Proje Yapısı
 
 ```
 elelem-ne-der/
-├── frontend/              # Next.js uygulaması
-│   ├── src/
-│   │   ├── app/          # Sayfa bileşenleri
-│   │   └── lib/          # Yardımcı fonksiyonlar
-│   └── package.json
-├── backend/               # Express.js API
-│   ├── lib/              # AI ve veritabanı modülleri
-│   ├── index.js          # Ana sunucu dosyası
-│   └── package.json
-├── shared/               # Ortak tip tanımları
-└── docs/                 # Dokümantasyon
+├── frontend/          # Next.js uygulaması
+├── backend/           # Express.js API
+├── schema.sql         # Veritabanı şeması
+└── PROJE_DOKUMANTASYONU.md  # Detaylı dokümantasyon
 ```
 
-## Geliştirme
+## 🤝 Katkıda Bulunma
 
-### Backend Geliştirme
-```bash
-cd backend
-npm run dev
-```
-
-### Frontend Geliştirme
-```bash
-cd frontend
-npm run dev
-```
-
-### Veritabanı Migrasyonları
-Supabase SQL Editor'de `backend/supabase-schema.sql` dosyasını çalıştırın.
-
-## Deployment
-
-### Vercel ile Deployment
-1. GitHub repository'sini Vercel'e bağlayın
-2. Environment variables'ları ekleyin
-3. Deploy edin
-
-### Environment Variables
-```env
-# Backend
-SUPABASE_URL=your_supabase_url
-SUPABASE_SERVICE_KEY=your_service_key
-HUGGINGFACE_API_KEY=your_hf_key
-
-# Frontend
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
-```
-
-## Katkıda Bulunma
-
-1. Fork edin
+1. Bu repository'yi fork edin
 2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
-3. Commit edin (`git commit -m 'Add amazing feature'`)
-4. Push edin (`git push origin feature/amazing-feature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Add amazing feature'`)
+4. Branch'inizi push edin (`git push origin feature/amazing-feature`)
 5. Pull Request oluşturun
 
-## Lisans
+## 📝 Lisans
 
-Bu proje MIT lisansı altında lisanslanmıştır.
+Bu proje eğitim amaçlı geliştirilmiştir.
 
-## İletişim
+## 📞 İletişim
 
-- Proje Sahibi: Hayrettin
-- UI/UX: Şevval
-- E-posta: [e-posta adresi]
+- **Proje Sahibi:** Hayrettin
+- **UI/UX:** Şevval
 
-## Teşekkürler
+---
 
-- Supabase ekibine veritabanı ve auth servisleri için
-- Hugging Face ekibine AI modelleri için
-- Next.js ve React topluluğuna
+**🚀 Proje hazır! Detaylar için [PROJE_DOKUMANTASYONU.md](PROJE_DOKUMANTASYONU.md) dosyasına bakın.**

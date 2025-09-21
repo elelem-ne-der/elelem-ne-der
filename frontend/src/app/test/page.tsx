@@ -70,7 +70,20 @@ export default function TestPage() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({
+          type: 'student',
+          data: {
+            student_number: 'TEST001',
+            first_name: 'Test',
+            last_name: 'Öğrenci',
+            grade: 5,
+            province: 'İstanbul',
+            district: 'Test',
+            school_type: 'ortaokul',
+            school_name: 'Test Okulu'
+          }
+        })
       });
 
       if (!response.ok) {
@@ -85,6 +98,61 @@ export default function TestPage() {
       setTestResult({
         success: false,
         error: `Admin Veri Girişi Hatası: ${errorMessage}\n\n🔍 Sorun Giderme:\n1. Backend çalışıyor mu?\n2. Supabase bağlantısı var mı?\n3. .env.local dosyasında SUPABASE_SERVICE_KEY var mı?`
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const testBulkImport = async () => {
+    setLoading(true);
+    try {
+      const bulkData = {
+        dataType: 'students',
+        data: [
+          {
+            student_number: 'BULK001',
+            first_name: 'Bulk',
+            last_name: 'Test1',
+            grade: 6,
+            province: 'Ankara',
+            district: 'Çankaya',
+            school_type: 'ortaokul',
+            school_name: 'Çankaya Ortaokulu'
+          },
+          {
+            student_number: 'BULK002',
+            first_name: 'Bulk',
+            last_name: 'Test2',
+            grade: 7,
+            province: 'İzmir',
+            district: 'Konak',
+            school_type: 'ortaokul',
+            school_name: 'Konak Ortaokulu'
+          }
+        ]
+      };
+
+      const response = await fetch('http://localhost:3001/api/admin/bulk-import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(bulkData)
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Bulk import hatası: ${response.status} - ${errorText}`);
+      }
+
+      const data = await response.json();
+      setTestResult({ success: true, data });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Bilinmeyen hata';
+      setTestResult({
+        success: false,
+        error: `Toplu Veri Girişi Hatası: ${errorMessage}\n\n🔍 Sorun Giderme:\n1. Backend çalışıyor mu?\n2. Supabase bağlantısı var mı?\n3. JSON formatı doğru mu?\n4. Zorunlu alanlar dolu mu?`
       });
     } finally {
       setLoading(false);
@@ -129,13 +197,22 @@ export default function TestPage() {
           <p className="text-sm text-gray-600 mb-4">
             Bu test admin paneli üzerinden örnek öğrenci/öğretmen verisi ekler.
           </p>
-          <button
-            onClick={testAdminDataEntry}
-            disabled={loading}
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50"
-          >
-            {loading ? 'Test ediliyor...' : 'Admin Veri Girişi Test Et'}
-          </button>
+          <div className="flex space-x-4">
+            <button
+              onClick={testAdminDataEntry}
+              disabled={loading}
+              className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 disabled:opacity-50"
+            >
+              {loading ? 'Test ediliyor...' : 'Tekli Veri Girişi Test Et'}
+            </button>
+            <button
+              onClick={testBulkImport}
+              disabled={loading}
+              className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+            >
+              {loading ? 'Test ediliyor...' : 'Toplu Veri Girişi Test Et'}
+            </button>
+          </div>
         </div>
 
         {testResult && (

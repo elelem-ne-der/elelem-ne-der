@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 interface Child {
   name: string;
@@ -10,8 +11,6 @@ interface Child {
 }
 
 interface RegisterForm {
-  firstName: string;
-  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -22,8 +21,6 @@ interface RegisterForm {
 
 export default function ParentRegister() {
   const [formData, setFormData] = useState<RegisterForm>({
-    firstName: '',
-    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -67,8 +64,21 @@ export default function ParentRegister() {
         throw new Error('Lütfen tüm çocukların bilgilerini doldurun');
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Supabase auth ile kayıt
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.email.split('@')[0], // Email'in @'dan önceki kısmı
+            role: 'parent'
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
 
       setSuccess(true);
 

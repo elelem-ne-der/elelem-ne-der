@@ -11,6 +11,28 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
+// Admin authentication middleware
+const adminAuth = (req, res, next) => {
+  const apiKey = req.headers['x-api-key'];
+  const expectedApiKey = process.env.ADMIN_API_KEY;
+
+  if (!expectedApiKey) {
+    return res.status(500).json({
+      success: false,
+      error: 'Admin API key not configured'
+    });
+  }
+
+  if (!apiKey || apiKey !== expectedApiKey) {
+    return res.status(401).json({
+      success: false,
+      error: 'Unauthorized - Invalid API key'
+    });
+  }
+
+  next();
+};
+
 // Routes
 app.get('/', (req, res) => {
   res.json({ message: 'Elelem Ne Der API is running!' });
@@ -34,55 +56,265 @@ app.get('/api/status', (req, res) => {
   });
 });
 
-// Admin - Veri Girişi
-app.post('/api/admin/seed-data', async (req, res) => {
+// Admin - Tekli Veri Girişi
+app.post('/api/admin/seed-data', adminAuth, async (req, res) => {
   try {
-    // Örnek öğrenci verisi
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 
-    // Örnek öğrenci
-    const { data: student, error: studentError } = await supabase
-      .from('students')
-      .insert({
-        id: '550e8400-e29b-41d4-a716-446655440006',
-        student_number: 'OGR003',
-        first_name: 'Can',
-        last_name: 'Demir',
-        grade: 7,
-        province: 'İzmir',
-        district: 'Konak',
-        school_type: 'ortaokul',
-        school_name: 'Konak Ortaokulu'
-      })
-      .select();
+    const { type, data } = req.body;
 
-    if (studentError) throw studentError;
+    if (type === 'student') {
+      // Önce auth.users'a kullanıcı oluştur (Service Role ile)
+      const userId = require('crypto').randomUUID();
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        id: userId,
+        email: data.email || `${data.student_number}@student.example.com`,
+        password: 'TempPass123!', // Geçici şifre, kullanıcı giriş yapınca değiştirebilir
+        user_metadata: {
+          full_name: `${data.first_name} ${data.last_name}`,
+          role: 'student'
+        }
+      });
 
-    // Örnek öğretmen
-    const { data: teacher, error: teacherError } = await supabase
-      .from('teachers')
-      .insert({
-        id: '550e8400-e29b-41d4-a716-446655440007',
-        teacher_number: 'OGR003',
-        first_name: 'Ali',
-        last_name: 'Yılmaz',
-        province: 'İzmir',
-        district: 'Konak',
-        school_name: 'Konak Ortaokulu',
-        contact_info: JSON.stringify([
-          { type: 'email', value: 'ali.yilmaz@okul.edu.tr' },
-          { type: 'phone', value: '05551234567' }
-        ])
-      })
-      .select();
+      if (authError) throw authError;
 
-    if (teacherError) throw teacherError;
+      // Okul bilgilerini al (varsayılan okul oluştur)
+      const { data: school, error: schoolError } = await supabase
+        .from('schools')
+        .insert({
+          district_id: data.district_id, // Frontend'den district_id gelmeli
+          name: data.school_name,
+          level: 'ilkokul', // Varsayılan
+          type: 'resmi'
+        })
+        .select()
+        .single();
+
+      if (schoolError) throw schoolError;
+
+      // Öğrenci oluştur
+      const { data: student, error: studentError } = await supabase
+        .from('students')
+        .insert({
+          id: userId, // auth.users'dan gelen ID
+          student_number: data.student_number,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          middle_name: data.middle_name || null,
+          grade: parseInt(data.grade),
+          school_id: school.id
+        })
+        .select()
+        .single();
+
+      if (studentError) throw studentError;
+
+      res.json({
+        success: true,
+        message: 'Öğrenci başarıyla eklendi',
+        data: student
+      });
+
+    } else if (type === 'teacher') {
+      // Önce auth.users'a kullanıcı oluştur (Service Role ile)
+      const userId = require('crypto').randomUUID();
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        id: userId,
+        email: data.email || `${data.teacher_number}@teacher.example.com`,
+        password: 'TempPass123!', // Geçici şifre, kullanıcı giriş yapınca değiştirebilir
+        user_metadata: {
+          full_name: `${data.first_name} ${data.last_name}`,
+          role: 'teacher'
+        }
+      });
+
+      if (authError) throw authError;
+
+      // Okul bilgilerini al (varsayılan okul oluştur)
+      const { data: school, error: schoolError } = await supabase
+        .from('schools')
+        .insert({
+          district_id: data.district_id, // Frontend'den district_id gelmeli
+          name: data.school_name,
+          level: 'ilkokul', // Varsayılan
+          type: 'resmi'
+        })
+        .select()
+        .single();
+
+      if (schoolError) throw schoolError;
+
+      // Öğretmen oluştur
+      const { data: teacher, error: teacherError } = await supabase
+        .from('teachers')
+        .insert({
+          id: userId, // auth.users'dan gelen ID
+          teacher_number: data.teacher_number,
+          first_name: data.first_name,
+          last_name: data.last_name,
+          middle_name: data.middle_name || null,
+          school_id: school.id,
+          contact_info: JSON.stringify([
+            { type: 'email', value: data.contact_email },
+            { type: 'phone', value: data.contact_phone }
+          ])
+        })
+        .select()
+        .single();
+
+      if (teacherError) throw teacherError;
+
+      res.json({
+        success: true,
+        message: 'Öğretmen başarıyla eklendi',
+        data: teacher
+      });
+    } else {
+      throw new Error('Geçersiz tip. student veya teacher olmalı');
+    }
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Admin - Toplu Veri Girişi (CSV/JSON)
+app.post('/api/admin/bulk-import', adminAuth, async (req, res) => {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+    const { dataType, data } = req.body;
+
+    if (!Array.isArray(data)) {
+      throw new Error('Veri array formatında olmalı');
+    }
+
+    let results = [];
+    let errors = [];
+
+    if (dataType === 'students') {
+      for (const student of data) {
+        try {
+          // Auth kullanıcısı oluştur
+          const userId = require('crypto').randomUUID();
+          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+            id: userId,
+            email: student.email || `${student.student_number}@student.example.com`,
+            password: 'TempPass123!',
+            user_metadata: {
+              full_name: `${student.first_name} ${student.last_name}`,
+              role: 'student'
+            }
+          });
+
+          if (authError) throw authError;
+
+          // Okul bilgilerini al
+          const { data: school, error: schoolError } = await supabase
+            .from('schools')
+            .insert({
+              district_id: student.district_id, // Frontend'den gelmeli
+              name: student.school_name,
+              level: 'ilkokul',
+              type: 'resmi'
+            })
+            .select()
+            .single();
+
+          if (schoolError) throw schoolError;
+
+          // Öğrenci oluştur
+          const { data: result, error } = await supabase
+            .from('students')
+            .insert({
+              id: userId, // auth.users'dan gelen ID
+              student_number: student.student_number,
+              first_name: student.first_name,
+              last_name: student.last_name,
+              middle_name: student.middle_name || null,
+              grade: parseInt(student.grade),
+              school_id: school.id
+            })
+            .select();
+
+          if (error) {
+            errors.push({ student: student.student_number, error: error.message });
+          } else {
+            results.push(result[0]);
+          }
+        } catch (error) {
+          errors.push({ student: student.student_number, error: error.message });
+        }
+      }
+    } else if (dataType === 'teachers') {
+      for (const teacher of data) {
+        try {
+          // Auth kullanıcısı oluştur
+          const userId = require('crypto').randomUUID();
+          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+            id: userId,
+            email: teacher.email || `${teacher.teacher_number}@teacher.example.com`,
+            password: 'TempPass123!',
+            user_metadata: {
+              full_name: `${teacher.first_name} ${teacher.last_name}`,
+              role: 'teacher'
+            }
+          });
+
+          if (authError) throw authError;
+
+          // Okul bilgilerini al
+          const { data: school, error: schoolError } = await supabase
+            .from('schools')
+            .insert({
+              district_id: teacher.district_id, // Frontend'den gelmeli
+              name: teacher.school_name,
+              level: 'ilkokul',
+              type: 'resmi'
+            })
+            .select()
+            .single();
+
+          if (schoolError) throw schoolError;
+
+          // Öğretmen oluştur
+          const { data: result, error } = await supabase
+            .from('teachers')
+            .insert({
+              id: userId, // auth.users'dan gelen ID
+              teacher_number: teacher.teacher_number,
+              first_name: teacher.first_name,
+              last_name: teacher.last_name,
+              middle_name: teacher.middle_name || null,
+              school_id: school.id,
+              contact_info: JSON.stringify([
+                { type: 'email', value: teacher.contact_email },
+                { type: 'phone', value: teacher.contact_phone }
+              ])
+            })
+            .select();
+
+          if (error) {
+            errors.push({ teacher: teacher.teacher_number, error: error.message });
+          } else {
+            results.push(result[0]);
+          }
+        } catch (error) {
+          errors.push({ teacher: teacher.teacher_number, error: error.message });
+        }
+      }
+    }
 
     res.json({
-      success: true,
-      message: 'Örnek veriler eklendi',
-      data: { student, teacher }
+      success: errors.length === 0,
+      message: `${results.length} kayıt başarıyla eklendi, ${errors.length} hata oluştu`,
+      results,
+      errors
     });
 
   } catch (error) {

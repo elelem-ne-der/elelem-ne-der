@@ -243,8 +243,7 @@ Bu proje eğitim amaçlı geliştirilmiştir.
 
 ## 📞 İletişim
 
-- **Proje Sahibi:** Hayrettin
-- **UI/UX:** Şevval
+- **Proje Sahibi:** Hayrettin, Şevval
 - **Teknoloji:** Next.js, Supabase, Express.js
 
 ---

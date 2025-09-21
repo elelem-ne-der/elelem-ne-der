@@ -388,8 +388,8 @@ app.post('/api/admin/seed-data', authenticateToken, async (req, res) => {
   }
 });
 
-// Admin - Toplu Veri Girişi (CSV/JSON) - TEMPORARILY WITHOUT AUTH FOR TESTING
-app.post('/api/admin/bulk-import', async (req, res) => {
+// Admin - Toplu Veri Girişi (CSV/JSON)
+app.post('/api/admin/bulk-import', authenticateToken, async (req, res) => {
   try {
     const { createClient } = require('@supabase/supabase-js');
     const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
@@ -406,16 +406,27 @@ app.post('/api/admin/bulk-import', async (req, res) => {
     if (dataType === 'students') {
       for (const student of data) {
         try {
-          // Geçici olarak kullanıcı oluşturmayı atla - sadece veritabanına ekle
+          // Auth kullanıcısı oluştur
           const userId = require('crypto').randomUUID();
-          console.log('Skipping auth user creation, using temp ID:', userId);
+          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+            id: userId,
+            email: student.email || `${student.student_number}@student.example.com`,
+            password: 'TempPass123!',
+            user_metadata: {
+              full_name: `${student.first_name} ${student.last_name}`,
+              role: 'student'
+            }
+          });
 
-          // Profile oluştur - auth_user_id olmadan
+          if (authError) throw authError;
+
+          // Profile oluştur
           const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .insert({
               id: userId,
-              email: student.email || `${student.student_number}@student.example.com`,
+              auth_user_id: userId,
+              email: authUser.user.email,
               name: `${student.first_name} ${student.last_name}`,
               role: 'student'
             })

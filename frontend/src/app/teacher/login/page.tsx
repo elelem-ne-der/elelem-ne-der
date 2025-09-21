@@ -1,18 +1,33 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function TeacherLogin() {
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Implement Supabase auth
-    console.log('Teacher login:', formData);
+    setError('');
+    setLoading(true);
+
+    try {
+      await signIn(formData.email, formData.password);
+      router.push('/teacher/dashboard');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Bir hata oluştu');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (

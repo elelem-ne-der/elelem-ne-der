@@ -1,8 +1,10 @@
--- Supabase veritabanı şeması
+-- Supabase Schema - FIXED (Trigger ile 1 veli-1 öğrenci kontrolü)
+-- Bu dosyayı Supabase SQL Editor'a kopyala ve çalıştır
 
--- Kullanıcılar tablosu (Supabase auth.users ile bağlantılı)
+-- Kullanıcı profilleri (Supabase auth.users ile senkronize)
 CREATE TABLE profiles (
-  id UUID REFERENCES auth.users(id) PRIMARY KEY,
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  auth_user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   email TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   role TEXT CHECK (role IN ('student', 'teacher', 'parent')) NOT NULL,
@@ -10,67 +12,14 @@ CREATE TABLE profiles (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Öğrenci profili
-CREATE TABLE students (
-  id UUID REFERENCES profiles(id) PRIMARY KEY,
-  student_number TEXT UNIQUE NOT NULL, -- Öğrenci numarası (unique)
-  first_name TEXT NOT NULL, -- Ad (zorunlu)
-  last_name TEXT NOT NULL, -- Soyad (zorunlu)
-  middle_name TEXT, -- Orta isim (isteğe bağlı)
-  grade INTEGER NOT NULL CHECK (grade >= 5 AND grade <= 12), -- 5-12. sınıf arası
-  school_id UUID REFERENCES schools(id) NOT NULL, -- Okul foreign key
-  parent_id UUID REFERENCES profiles(id), -- Maksimum 1 veli
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Öğretmen profili
-CREATE TABLE teachers (
-  id UUID REFERENCES profiles(id) PRIMARY KEY,
-  teacher_number TEXT UNIQUE NOT NULL, -- Öğretmen numarası (unique)
-  first_name TEXT NOT NULL, -- Ad (zorunlu)
-  last_name TEXT NOT NULL, -- Soyad (zorunlu)
-  middle_name TEXT, -- Orta isim (isteğe bağlı)
-  school_id UUID REFERENCES schools(id) NOT NULL, -- Okul foreign key
-  contact_info JSONB NOT NULL CHECK (jsonb_array_length(contact_info) >= 1), -- En az 1 mail/telefon
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Veli profili
-CREATE TABLE parents (
-  id UUID REFERENCES profiles(id) PRIMARY KEY,
-  first_name TEXT NOT NULL, -- Ad (zorunlu)
-  last_name TEXT NOT NULL, -- Soyad (zorunlu)
-  middle_name TEXT, -- Orta isim (isteğe bağlı)
-  phone TEXT, -- Telefon numarası
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Veli-Öğrenci ilişkisi (1 veli - 1 öğrenci kısıtı için)
-CREATE TABLE parent_students (
-  parent_id UUID REFERENCES parents(id) ON DELETE CASCADE,
-  student_id UUID REFERENCES students(id) ON DELETE CASCADE,
-  relationship TEXT DEFAULT 'veli', -- anne/baba/vasi vb.
-  PRIMARY KEY (parent_id, student_id),
-  CONSTRAINT one_parent_per_student CHECK (
-    NOT EXISTS (
-      SELECT 1 FROM parent_students ps2
-      WHERE ps2.student_id = parent_students.student_id
-      AND ps2.parent_id != parent_students.parent_id
-    )
-  )
-);
-
--- İller tablosu
+-- İller tablosu (bağımsız)
 CREATE TABLE provinces (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL UNIQUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- İlçeler tablosu
+-- İlçeler tablosu (provinces'e bağlı)
 CREATE TABLE districts (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   province_id UUID REFERENCES provinces(id) ON DELETE CASCADE,
@@ -79,7 +28,7 @@ CREATE TABLE districts (
   UNIQUE(province_id, name)
 );
 
--- Okullar tablosu
+-- Okullar tablosu (districts'e bağlı)
 CREATE TABLE schools (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   district_id UUID REFERENCES districts(id) ON DELETE CASCADE,
@@ -93,7 +42,53 @@ CREATE TABLE schools (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Ödevler
+-- Öğrenci profili (profiles ve schools'a bağlı)
+CREATE TABLE students (
+  id UUID REFERENCES profiles(id) PRIMARY KEY,
+  student_number TEXT UNIQUE NOT NULL, -- Öğrenci numarası (unique)
+  first_name TEXT NOT NULL, -- Ad (zorunlu)
+  last_name TEXT NOT NULL, -- Soyad (zorunlu)
+  middle_name TEXT, -- Orta isim (isteğe bağlı)
+  grade INTEGER NOT NULL CHECK (grade >= 5 AND grade <= 12), -- 5-12. sınıf arası
+  school_id UUID REFERENCES schools(id) NOT NULL, -- Okul foreign key
+  parent_id UUID REFERENCES profiles(id), -- Maksimum 1 veli
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Öğretmen profili (profiles ve schools'a bağlı)
+CREATE TABLE teachers (
+  id UUID REFERENCES profiles(id) PRIMARY KEY,
+  teacher_number TEXT UNIQUE NOT NULL, -- Öğretmen numarası (unique)
+  first_name TEXT NOT NULL, -- Ad (zorunlu)
+  last_name TEXT NOT NULL, -- Soyad (zorunlu)
+  middle_name TEXT, -- Orta isim (isteğe bağlı)
+  school_id UUID REFERENCES schools(id) NOT NULL, -- Okul foreign key
+  contact_info JSONB NOT NULL CHECK (jsonb_array_length(contact_info) >= 1), -- En az 1 mail/telefon
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Veli profili (profiles'e bağlı)
+CREATE TABLE parents (
+  id UUID REFERENCES profiles(id) PRIMARY KEY,
+  first_name TEXT NOT NULL, -- Ad (zorunlu)
+  last_name TEXT NOT NULL, -- Soyad (zorunlu)
+  middle_name TEXT, -- Orta isim (isteğe bağlı)
+  phone TEXT, -- Telefon numarası
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Veli-Öğrenci ilişkisi (trigger ile 1 veli - 1 öğrenci kontrolü)
+CREATE TABLE parent_students (
+  parent_id UUID REFERENCES parents(id) ON DELETE CASCADE,
+  student_id UUID REFERENCES students(id) ON DELETE CASCADE,
+  relationship TEXT DEFAULT 'veli', -- anne/baba/vasi vb.
+  PRIMARY KEY (parent_id, student_id)
+);
+
+-- Ödevler (teachers'a bağlı)
 CREATE TABLE assignments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   title TEXT NOT NULL,
@@ -106,7 +101,7 @@ CREATE TABLE assignments (
   due_date TIMESTAMP WITH TIME ZONE
 );
 
--- Sorular
+-- Sorular (assignments'a bağlı)
 CREATE TABLE questions (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   assignment_id UUID REFERENCES assignments(id) ON DELETE CASCADE,
@@ -119,7 +114,7 @@ CREATE TABLE questions (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Öğrenci cevapları
+-- Öğrenci cevapları (students, questions, assignments'a bağlı)
 CREATE TABLE student_answers (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   student_id UUID REFERENCES students(id) NOT NULL,
@@ -131,7 +126,7 @@ CREATE TABLE student_answers (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Analiz sonuçları
+-- Analiz sonuçları (students, assignments'a bağlı)
 CREATE TABLE analysis_results (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   student_id UUID REFERENCES students(id) NOT NULL,
@@ -143,7 +138,7 @@ CREATE TABLE analysis_results (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Yol haritası adımları
+-- Yol haritası adımları (analysis_results'e bağlı)
 CREATE TABLE roadmap_steps (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   analysis_id UUID REFERENCES analysis_results(id) ON DELETE CASCADE,
@@ -157,7 +152,7 @@ CREATE TABLE roadmap_steps (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Etiketler
+-- Etiketler (bağımsız)
 CREATE TABLE tags (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   name TEXT NOT NULL,
@@ -167,7 +162,7 @@ CREATE TABLE tags (
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- RLS (Row Level Security) politikaları
+-- Row Level Security Politikaları
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE students ENABLE ROW LEVEL SECURITY;
 ALTER TABLE teachers ENABLE ROW LEVEL SECURITY;
@@ -183,10 +178,10 @@ ALTER TABLE roadmap_steps ENABLE ROW LEVEL SECURITY;
 
 -- Profil politikaları
 CREATE POLICY "Users can view own profile" ON profiles
-  FOR SELECT USING (auth.uid() = id);
+  FOR SELECT USING (auth.uid() = auth_user_id);
 
 CREATE POLICY "Users can update own profile" ON profiles
-  FOR UPDATE USING (auth.uid() = id);
+  FOR UPDATE USING (auth.uid() = auth_user_id);
 
 -- Öğrenci politikaları
 CREATE POLICY "Students can view own data" ON students
@@ -207,6 +202,13 @@ CREATE POLICY "Teachers can view their students" ON students
     JOIN teachers t ON a.teacher_id = t.id
     WHERE t.id = auth.uid()
   ));
+
+-- Öğretmen politikaları
+CREATE POLICY "Teachers can view own data" ON teachers
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Teachers can update own data" ON teachers
+  FOR UPDATE USING (auth.uid() = id);
 
 -- Ödev politikaları
 CREATE POLICY "Teachers can view own assignments" ON assignments
@@ -261,53 +263,44 @@ CREATE POLICY "Service role can insert districts" ON districts
 CREATE POLICY "Service role can insert schools" ON schools
   FOR INSERT WITH CHECK (true);
 
--- Örnek veriler (veri girişi için)
-INSERT INTO tags (name, subject, grade, description) VALUES
-  ('kesirler', 'Matematik', 5, 'Kesir işlemleri ve kavramları'),
-  ('toplama', 'Matematik', 5, 'Temel toplama işlemleri'),
-  ('çıkarma', 'Matematik', 5, 'Temel çıkarma işlemleri'),
-  ('fiiller', 'Türkçe', 6, 'Fiil türleri ve çekimleri'),
-  ('isimler', 'Türkçe', 6, 'İsim türleri ve özellikleri');
+-- Auth triggers (kullanıcı kayıt olduğunda profiles'a otomatik ekle)
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.profiles (auth_user_id, email, name, role)
+  VALUES (
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'full_name', split_part(NEW.email, '@', 1)),
+    COALESCE(NEW.raw_user_meta_data->>'role', 'student')
+  );
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 
--- Örnek öğrenci verisi
-INSERT INTO profiles (id, email, name, role) VALUES
-  ('550e8400-e29b-41d4-a716-446655440001', 'ahmet.yilmaz@okul.edu.tr', 'Ahmet Yılmaz', 'student'),
-  ('550e8400-e29b-41d4-a716-446655440002', 'fatma.kaya@okul.edu.tr', 'Fatma Kaya', 'student');
+-- Trigger'ı oluştur
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
 
-INSERT INTO students (id, student_number, first_name, last_name, grade, province, district, school_type, school_name) VALUES
-  ('550e8400-e29b-41d4-a716-446655440001', 'OGR001', 'Ahmet', 'Yılmaz', 5, 'İstanbul', 'Kadıköy', 'ortaokul', 'Kadıköy Ortaokulu'),
-  ('550e8400-e29b-41d4-a716-446655440002', 'OGR002', 'Fatma', 'Kaya', 6, 'Ankara', 'Çankaya', 'ortaokul', 'Çankaya Ortaokulu');
+-- Veli-Öğrenci ilişkisi için trigger (1 veli - 1 öğrenci kontrolü)
+CREATE OR REPLACE FUNCTION check_one_parent_per_student()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- Aynı öğrenciye başka bir veli atanmış mı kontrol et
+  IF EXISTS (
+    SELECT 1 FROM parent_students
+    WHERE student_id = NEW.student_id
+    AND parent_id != NEW.parent_id
+  ) THEN
+    RAISE EXCEPTION 'Bu öğrenciye zaten bir veli atanmış';
+  END IF;
 
--- Örnek öğretmen verisi
-INSERT INTO profiles (id, email, name, role) VALUES
-  ('550e8400-e29b-41d4-a716-446655440003', 'mehmet.hoca@okul.edu.tr', 'Mehmet Hoca', 'teacher'),
-  ('550e8400-e29b-41d4-a716-446655440004', 'ayse.ogretmen@okul.edu.tr', 'Ayşe Öğretmen', 'teacher');
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
 
-INSERT INTO teachers (id, teacher_number, first_name, last_name, province, district, school_name, contact_info) VALUES
-  ('550e8400-e29b-41d4-a716-446655440003', 'OGR001', 'Mehmet', 'Hoca', 'İstanbul', 'Kadıköy', 'Kadıköy Ortaokulu', '[{"type": "email", "value": "mehmet.hoca@okul.edu.tr"}, {"type": "phone", "value": "05551234567"}]'),
-  ('550e8400-e29b-41d4-a716-446655440004', 'OGR002', 'Ayşe', 'Öğretmen', 'Ankara', 'Çankaya', 'Çankaya Ortaokulu', '[{"type": "email", "value": "ayse.ogretmen@okul.edu.tr"}, {"type": "phone", "value": "05557654321"}]');
-
--- Örnek veli verisi
-INSERT INTO profiles (id, email, name, role) VALUES
-  ('550e8400-e29b-41d4-a716-446655440005', 'veli.yilmaz@email.com', 'Veli Yılmaz', 'parent');
-
-INSERT INTO parents (id, first_name, last_name, phone) VALUES
-  ('550e8400-e29b-41d4-a716-446655440005', 'Veli', 'Yılmaz', '05559876543');
-
--- Veli-Öğrenci ilişkisi
-INSERT INTO parent_students (parent_id, student_id, relationship) VALUES
-  ('550e8400-e29b-41d4-a716-446655440005', '550e8400-e29b-41d4-a716-446655440001', 'baba');
-
--- Örnek ödev
-INSERT INTO assignments (title, description, grade, subject, topic, teacher_id, due_date) VALUES
-  ('Matematik - Kesirler Testi', 'Bu hafta işlediğimiz kesir konularını pekiştirmek için', 5, 'Matematik', 'Kesirler', '550e8400-e29b-41d4-a716-446655440003', NOW() + INTERVAL '7 days');
-
--- Örnek sorular
-INSERT INTO questions (assignment_id, question, options, correct_answer, tags, difficulty, explanation) VALUES
-  ((SELECT id FROM assignments WHERE title = 'Matematik - Kesirler Testi'),
-   '1/2 + 1/4 = ?',
-   '["2/6", "3/4", "1/6", "2/4"]',
-   1,
-   ARRAY['kesirler', 'toplama'],
-   'easy',
-   '1/2 = 2/4, 2/4 + 1/4 = 3/4');
+-- Trigger'ı parent_students tablosuna ekle
+CREATE TRIGGER enforce_one_parent_per_student
+  BEFORE INSERT ON parent_students
+  FOR EACH ROW EXECUTE FUNCTION check_one_parent_per_student();

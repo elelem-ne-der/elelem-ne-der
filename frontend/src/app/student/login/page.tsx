@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/contexts/AuthContext';
-import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 export default function StudentLogin() {
   const [formData, setFormData] = useState({
@@ -48,6 +49,7 @@ export default function StudentLogin() {
               value={formData.email}
               onChange={(e) => setFormData({...formData, email: e.target.value})}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="E-posta adresinizi girin"
               required
             />
           </div>

@@ -3,10 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
 interface RegisterForm {
-  firstName: string;
-  lastName: string;
   email: string;
   password: string;
   confirmPassword: string;
@@ -16,8 +15,6 @@ interface RegisterForm {
 
 export default function StudentRegister() {
   const [formData, setFormData] = useState<RegisterForm>({
-    firstName: '',
-    lastName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -36,7 +33,7 @@ export default function StudentRegister() {
 
     try {
       // Form validation
-      if (!formData.firstName || !formData.lastName || !formData.email || !formData.password || !formData.grade) {
+      if (!formData.email || !formData.password || !formData.grade) {
         throw new Error('Lütfen zorunlu alanları doldurun');
       }
 
@@ -54,8 +51,36 @@ export default function StudentRegister() {
         throw new Error('Geçerli bir e-posta adresi girin');
       }
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Supabase auth ile kayıt
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            full_name: formData.email.split('@')[0], // Email'in @'dan önceki kısmı
+            role: 'student'
+          }
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      // Auth başarılı, şimdi profile'ı güncelle
+      if (data.user) {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({
+            name: formData.email.split('@')[0], // Email'in @'dan önceki kısmı
+            role: 'student'
+          })
+          .eq('auth_user_id', data.user.id);
+
+        if (profileError) {
+          console.error('Profile update error:', profileError);
+        }
+      }
 
       setSuccess(true);
 
@@ -64,8 +89,8 @@ export default function StudentRegister() {
         router.push('/student/login');
       }, 2000);
 
-    } catch (error) {
-      setError(error instanceof Error ? error.message : 'Bir hata oluştu');
+    } catch (error: any) {
+      setError(error.message || 'Bir hata oluştu');
     } finally {
       setLoading(false);
     }

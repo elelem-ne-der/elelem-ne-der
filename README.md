@@ -69,7 +69,7 @@ npm run dev
 ### 4. Supabase Kurulumu
 1. [Supabase](https://supabase.com) hesabı oluşturun
 2. Yeni proje oluşturun
-3. `backend/supabase-schema.sql` dosyasını SQL Editor'de çalıştırın
+3. `schema.sql` dosyasını SQL Editor'de çalıştırın
 4. API anahtarlarını `.env` dosyalarına ekleyin
 
 ## API Endpoints

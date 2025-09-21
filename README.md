@@ -19,9 +19,6 @@
 | **Öğretmen** | Ödev oluşturma, öğrenci takibi | Sınıf yönetimi, rapor görüntüleme |
 | **Veli** | Çocuk takibi | Performans raporları, gelişim takibi |
 
-### 📖 Detaylı Dokümantasyon
-
-Tüm proje detayları için [PROJE_DOKUMANTASYONU.md](PROJE_DOKUMANTASYONU.md) dosyasına bakın.
 
 ## 🛠️ Teknoloji Yığını
 

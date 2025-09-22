@@ -25,6 +25,15 @@ export default function Home() {
       </div>
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="text-center">
+          {/* Logo above the heading */}
+          <div className="mb-4">
+            <img 
+              src="/pusula_iconuc.png" 
+              alt="Pusula Logo" 
+              className="mx-auto" 
+              style={{ width: '80px', height: '80px', objectFit: 'contain' }} 
+            />
+          </div>
           <h1 className="text-5xl font-bold text-white mb-6 text-center">
             <span className="inline-flex items-center justify-center">
               Pusula

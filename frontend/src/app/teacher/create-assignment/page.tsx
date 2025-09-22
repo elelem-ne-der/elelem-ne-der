@@ -11,6 +11,9 @@ interface AssignmentForm {
   topic: string;
   questions: number;
   dueDate: string;
+  targetType: 'class' | 'section' | 'students';
+  section?: string;
+  studentIdentifiers?: string; // comma/newline separated ids or emails
 }
 
 export default function CreateAssignment() {
@@ -20,7 +23,10 @@ export default function CreateAssignment() {
     subject: '',
     topic: '',
     questions: 1,
-    dueDate: ''
+    dueDate: '',
+    targetType: 'class',
+    section: '',
+    studentIdentifiers: ''
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -36,6 +42,14 @@ export default function CreateAssignment() {
       // Form validation
       if (!formData.title || !formData.grade || !formData.subject || !formData.topic) {
         throw new Error('Lütfen tüm zorunlu alanları doldurun');
+      }
+
+      if (formData.targetType === 'section' && !formData.section?.trim()) {
+        throw new Error('Şube ataması için şube adı/kodu girin');
+      }
+
+      if (formData.targetType === 'students' && !formData.studentIdentifiers?.trim()) {
+        throw new Error('Öğrenci ataması için en az bir öğrenci bilgisi girin');
       }
 
       // Simulate API call
@@ -217,6 +231,58 @@ export default function CreateAssignment() {
                 value={formData.dueDate}
                 onChange={handleChange}
               />
+            </div>
+
+            {/* Assignment Target */}
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ödev Kime Atanacak? *
+              </label>
+              <div className="flex flex-wrap gap-3 mb-3">
+                <label className={`px-4 py-2 rounded-lg border cursor-pointer ${formData.targetType === 'class' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                  <input type="radio" name="targetType" value="class" className="sr-only" checked={formData.targetType === 'class'} onChange={handleChange} />
+                  Tüm Sınıf
+                </label>
+                <label className={`px-4 py-2 rounded-lg border cursor-pointer ${formData.targetType === 'section' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                  <input type="radio" name="targetType" value="section" className="sr-only" checked={formData.targetType === 'section'} onChange={handleChange} />
+                  Şube (örn: 8-A)
+                </label>
+                <label className={`px-4 py-2 rounded-lg border cursor-pointer ${formData.targetType === 'students' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}>
+                  <input type="radio" name="targetType" value="students" className="sr-only" checked={formData.targetType === 'students'} onChange={handleChange} />
+                  Seçili Öğrenciler
+                </label>
+              </div>
+
+              {formData.targetType === 'section' && (
+                <div className="mt-2">
+                  <label htmlFor="section" className="block text-sm font-medium text-gray-700 mb-2">Şube</label>
+                  <input
+                    type="text"
+                    id="section"
+                    name="section"
+                    placeholder="Örn: 8-A veya A, B"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={formData.section}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+
+              {formData.targetType === 'students' && (
+                <div className="mt-2">
+                  <label htmlFor="studentIdentifiers" className="block text-sm font-medium text-gray-700 mb-2">Öğrenciler (virgül veya satır ile ayırın)</label>
+                  <textarea
+                    id="studentIdentifiers"
+                    name="studentIdentifiers"
+                    rows={4}
+                    placeholder="Örn: ogr1@okul.com, ogr2@okul.com\nveya\n12345, 67890"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    value={formData.studentIdentifiers}
+                    onChange={handleChange}
+                  />
+                  <p className="mt-2 text-xs text-gray-500">E-posta veya okul numarası kabul edilir.</p>
+                </div>
+              )}
             </div>
           </div>
 

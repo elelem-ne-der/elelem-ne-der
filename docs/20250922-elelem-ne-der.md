@@ -38,6 +38,8 @@ Bu güncelleme ile panellere "Nasıl kullanılır?" blokları eklendi. Kod/endpo
 
 - Yeni Ödev Sayfası (`/teacher/create-assignment`):
   - Form üstünde AI bilgilendirme kutusu gösterilir.
+  - Ödev hedefi seçimi: Tüm sınıf, Şube (örn: 8-A) veya Seçili Öğrenciler.
+  - Seçili öğrencileri e-posta veya okul numarasıyla virgül/satır ayırarak girin.
 
 - Öğrenci Paneli (`/student/dashboard`):
   - Üstte kullanım rehberi; "Ödevlere Git" ile atanmış ödevler listesine atlar.

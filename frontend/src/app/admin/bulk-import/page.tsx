@@ -41,8 +41,8 @@ export default function BulkImportPage() {
         throw new Error('Giriş yapmanız gerekiyor. Lütfen admin paneline giriş yapın.');
       }
 
-      // Backend server kontrolü
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/bulk-import`, {
+      // Backend server kontrolü (frontend proxy üzerinden)
+      const response = await fetch(`/api/backend/api/admin/bulk-import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

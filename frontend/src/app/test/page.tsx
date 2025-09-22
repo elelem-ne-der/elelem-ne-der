@@ -216,7 +216,7 @@ export default function TestPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <h2 className="text-xl font-semibold mb-4 text-gray-900">AI Test</h2>
             <p className="text-sm text-gray-600 mb-4">
-              Bu test backend'in AI fonksiyonlarını kontrol eder. Gerçek AI için HUGGINGFACE_API_KEY gerekli.
+              Bu test backend'in AI fonksiyonlarını kontrol eder. Gerçek AI için GEMINI_API_KEY gerekli.
             </p>
             <button
               onClick={testAI}

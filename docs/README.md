@@ -54,7 +54,7 @@ cd frontend && npm install
 ### 2. Supabase Kurulumu
 1. [Supabase](https://supabase.com) hesabı oluşturun
 2. Yeni proje oluşturun
-3. `schema.sql` dosyasını SQL Editor'de çalıştırın
+3. `docs/complete-database-setup.sql` dosyasını Supabase SQL Editor'de çalıştırın
 4. API anahtarlarını environment dosyalarına ekleyin
 
 ### 3. Çalıştırma
@@ -77,7 +77,7 @@ cd frontend && npm run dev
 4. **Project Settings** → **Environment Variables** kısmında:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_API_URL` (Backend URL'iniz)
+   - `NEXT_PUBLIC_BACKEND_URL` (Backend URL'iniz; örn. `https://your-backend.vercel.app`)
 
 #### Backend Deploy
 1. Backend klasörüne gidin: `cd backend`
@@ -95,6 +95,19 @@ cd frontend && npm run dev
    - `GEMINI_MODEL` (örn. `gemini-1.5-flash`)
 
 **🌐 Production URL'lerinizden uygulamaya erişin.**
+
+## 🔀 Frontend → Backend Proxy Kullanımı
+
+Frontend, backend'e doğrudan domain ile değil, dahili proxy route ile istek atar:
+
+- İstek adresi: `/api/backend/...`
+- Taban URL: `NEXT_PUBLIC_BACKEND_URL`
+
+Örn:
+
+```text
+POST /api/backend/api/admin/bulk-import
+```
 
 ## 📊 API Endpoints
 

@@ -112,6 +112,23 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
 - Proxy tüm HTTP metodlarını iletir ve `Content-Type: application/json` gövdesini otomatik taşır.
 - Production'da `NEXT_PUBLIC_BACKEND_URL` Vercel ortam değişkenlerine eklenmelidir.
 
+## 2025-09-22 — Teslim Öncesi Temizlik ve Son Dokunuşlar
+
+### Yapılan Düzenlemeler
+- Frontend proxy route sadeleştirildi; kullanılmayan yardımcı fonksiyon kaldırıldı.
+- Admin sayfaları `NEXT_PUBLIC_API_URL` yerine dahili proxy (`/api/backend/...`) üzerinden backend'e bağlanacak şekilde güncellendi.
+- Test sayfasındaki AI anahtar notu `GEMINI_API_KEY` olacak şekilde düzeltildi.
+- `frontend/env.local.example` dosyası güncellendi: `NEXT_PUBLIC_API_URL` ve `NEXT_PUBLIC_ADMIN_API_KEY` kaldırıldı, `NEXT_PUBLIC_BACKEND_URL` eklendi.
+- Kullanılmayan public görseller kaldırıldı: `file.svg`, `globe.svg`, `next.svg`, `vercel.svg`, `window.svg`. Kullanılan `pusula_iconuc.png` korundu.
+
+### Son Kontrol Listesi
+1) Supabase SQL'i çalıştırın: `docs/complete-database-setup.sql`
+2) Backend `.env` değişkenlerini ayarlayın: `SUPABASE_*`, `ADMIN_*`, `JWT_SECRET`, `GEMINI_*`, `ALLOWED_ORIGINS`
+3) Frontend `.env.local` ayarlayın: `NEXT_PUBLIC_SUPABASE_*`, `NEXT_PUBLIC_BACKEND_URL`
+4) Backend'i başlatın: `cd backend && npm run dev`
+5) Frontend'i başlatın: `cd frontend && npm run dev`
+6) Tarayıcıda `/test` ve `/admin` sayfalarını doğrulayın
+
 ## Genişletilmiş AI Analizi
 
 `/api/analyze-results` yanıtı genişletildi:

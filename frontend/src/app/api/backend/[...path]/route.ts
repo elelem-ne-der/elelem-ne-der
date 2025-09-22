@@ -4,12 +4,6 @@ function getBackendUrl(): string | undefined {
   return process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
 }
 
-function buildTargetUrl(pathname: string, search: string): string {
-  const base = (backendUrl || '').replace(/\/$/, '');
-  const path = pathname.replace(/^\/api\/backend/, '');
-  return `${base}${path}${search ? `?${search}` : ''}`;
-}
-
 async function proxy(request: NextRequest) {
   const configuredBackend = getBackendUrl();
 

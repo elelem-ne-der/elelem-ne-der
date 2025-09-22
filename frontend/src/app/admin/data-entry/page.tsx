@@ -68,7 +68,7 @@ export default function DataEntryPage() {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/seed-data`, {
+      const response = await fetch(`/api/backend/api/admin/seed-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ export default function DataEntryPage() {
         return;
       }
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/seed-data`, {
+      const response = await fetch(`/api/backend/api/admin/seed-data`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

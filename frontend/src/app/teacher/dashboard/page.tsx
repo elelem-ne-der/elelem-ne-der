@@ -75,6 +75,23 @@ export default function TeacherDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 bg-white border border-green-200 rounded-lg p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 mb-3">Nasıl kullanılır?</h2>
+          <ol className="list-decimal list-inside space-y-2 text-gray-700">
+            <li>"Yeni Ödev Oluştur" ile sınıf, ders ve konu seç.</li>
+            <li>Soru sayısını ve zorluk seviyesini belirle, kaydet.</li>
+            <li>Ödev otomatik atanır; sonuçlar burada görünür.</li>
+            <li>Öğrenci sonuçlarını ve zayıf/kuvvetli konuları incele.</li>
+          </ol>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/teacher/create-assignment" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+              Hemen Ödev Oluştur
+            </Link>
+            <Link href="/teacher/dashboard" className="bg-white border border-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-50 transition">
+              İstatistikleri Gör
+            </Link>
+          </div>
+        </div>
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">

@@ -23,9 +23,25 @@ export default function TeacherDashboard() {
 
   const fetchAssignments = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/assignments');
+      const response = await fetch('/api/backend/api/assignments');
       const data = await response.json();
-      setAssignments(data);
+      let merged = Array.isArray(data) ? data : [];
+      try {
+        const localRaw = typeof window !== 'undefined' ? localStorage.getItem('local_assignments') : null;
+        const localList: any[] = localRaw ? JSON.parse(localRaw) : [];
+        if (Array.isArray(localList) && localList.length) {
+          const key = (a: any) => `${a.title}|${a.created_at}`;
+          const seen = new Set(merged.map(key));
+          for (const a of localList) {
+            const k = key(a);
+            if (!seen.has(k)) {
+              merged.unshift(a);
+              seen.add(k);
+            }
+          }
+        }
+      } catch (_) {}
+      setAssignments(merged);
     } catch (error) {
       console.error('Error fetching assignments:', error);
     } finally {

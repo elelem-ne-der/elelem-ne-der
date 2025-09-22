@@ -28,7 +28,7 @@ export default function AssignmentPage() {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(`http://localhost:3001/api/questions/${params.id}`);
+      const response = await fetch(`/api/backend/api/questions/${params.id}`);
       const data = await response.json();
       setQuestions(data);
       setAnswers(new Array(data.length).fill(-1));
@@ -72,7 +72,7 @@ export default function AssignmentPage() {
         tags: question.tags
       }));
 
-      const response = await fetch('http://localhost:3001/api/analyze-results', {
+      const response = await fetch('/api/backend/api/analyze-results', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

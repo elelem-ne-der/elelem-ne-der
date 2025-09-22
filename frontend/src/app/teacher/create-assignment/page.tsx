@@ -53,7 +53,25 @@ export default function CreateAssignment() {
       }
 
       // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Optimistic local cache so dashboards can show immediately
+      try {
+        const localRaw = typeof window !== 'undefined' ? localStorage.getItem('local_assignments') : null;
+        const list = localRaw ? JSON.parse(localRaw) : [];
+        const createdAt = new Date().toISOString();
+        const tempAssignment = {
+          id: Date.now(),
+          title: formData.title,
+          grade: parseInt(formData.grade || '0', 10),
+          subject: formData.subject,
+          topic: formData.topic,
+          questions: formData.questions,
+          created_at: createdAt,
+        };
+        const next = Array.isArray(list) ? [tempAssignment, ...list] : [tempAssignment];
+        if (typeof window !== 'undefined') localStorage.setItem('local_assignments', JSON.stringify(next));
+      } catch (_) {}
 
       setSuccess(true);
 

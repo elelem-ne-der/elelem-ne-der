@@ -27,13 +27,13 @@ export default function Home() {
         <div className="text-center">
           <h1 className="text-5xl font-bold text-white mb-6 text-center">
             <span className="inline-flex items-center justify-center">
-              Pusula
               <img 
                 src="/pusula_iconuc.png" 
                 alt="Pusula Logo" 
-                className="ml-3" 
-                style={{ width: '100px', height: '100px', objectFit: 'contain' }} 
+                className="mr-3" 
+                style={{ width: '120px', height: '120px', objectFit: 'contain' }} 
               />
+              Pusula
             </span>
           </h1>
           <p className="text-xl text-gray-600 mb-8">

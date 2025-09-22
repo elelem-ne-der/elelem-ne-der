@@ -1,0 +1,245 @@
+{
+  "grade": "9",
+  "subjects": [
+    {
+      "name": "Matematik",
+      "slug": "matematik",
+      "units": [
+        { "name": "Mantık", "topics": [
+          "Önermeler ve Bileşik Önermeler"
+        ]},
+        { "name": "Kümeler", "topics": [
+          "Kümelerde Temel Kavramlar",
+          "Kümelerde İşlemler"
+        ]},
+        { "name": "Denklemler ve Eşitsizlikler", "topics": [
+          "Sayı Kümeleri",
+          "Bölünebilme Kuralları",
+          "Birinci Dereceden Denklem ve Eşitsizlikler",
+          "Üslü İfadeler ve Denklemler",
+          "Denklemler ve Eşitsizliklerle İlgili Uygulamalar"
+        ]},
+        { "name": "Üçgenler", "topics": [
+          "Üçgenlerde Temel Kavramlar",
+          "Üçgenlerde Eşlik",
+          "Üçgenlerin Benzerliği",
+          "Üçgenin Yardımcı Elemanları",
+          "Dik Üçgen ve Trigonometri, Üçgenin Alanı"
+        ]},
+        { "name": "Veri", "topics": [
+          "Merkezi Eğilim ve Yayılım Ölçüleri",
+          "Verilerin Grafikle Gösterilmesi"
+        ]}
+      ]
+    },
+    {
+      "name": "Fizik",
+      "slug": "fizik",
+      "units": [
+        { "name": "Fizik Bilimine Giriş", "topics": []},
+        { "name": "Madde ve Özellikleri", "topics": [
+          "Kütle, Hacim, Özkütle",
+          "Dayanıklılık",
+          "Yapışma, Birbirini Tutma",
+          "Yüzey Gerilimi, Kılcallık",
+          "Katılar, Sıvılar, Gazlar"
+        ]},
+        { "name": "Hareket ve Kuvvet", "topics": [
+          "Referans Noktası",
+          "Konum, Alınan Yol, Yer Değiştirme, Sürat, Hız",
+          "Anlık Hız, Ortalama Hız",
+          "Kuvvet",
+          "İvme",
+          "Eylemsizlik",
+          "Etki-Tepki Kuvvetleri",
+          "Sürtünme Kuvveti"
+        ]},
+        { "name": "Enerji", "topics": [
+          "İş, Enerji, Güç",
+          "Öteleme Kinetik Enerjisi",
+          "Yer Çekimi Potansiyel Enerjisi",
+          "Esneklik Potansiyel Enerjisi",
+          "Mekanik Enerji, Enerji Korunumu",
+          "Enerji Dönüşümü",
+          "Verim",
+          "Yenilenebilir ve Yenilenemez Enerji",
+          "Isı ve Sıcaklık",
+          "Elektrostatik"
+        ]}
+      ]
+    },
+    {
+      "name": "Kimya",
+      "slug": "kimya",
+      "units": [
+        { "name": "Kimya Bilimi", "topics": [
+          "Simyadan Kimyaya",
+          "Kimya Disiplinleri ve Kimyacıların Çalışma Alanları",
+          "Kimyanın Sembolik Dili",
+          "Kimya Uygulamalarında İş Sağlığı ve Güvenliği"
+        ]},
+        { "name": "Atom ve Periyodik Sistem", "topics": [
+          "Atom Modelleri",
+          "Atomun Yapısı",
+          "Periyodik Sistem"
+        ]},
+        { "name": "Kimyasal Türler Arası Etkileşimler", "topics": [
+          "Kimyasal Tür",
+          "Kimyasal Türler Arası Etkileşimlerin Sınıflandırılması",
+          "Güçlü Etkileşimler",
+          "Zayıf Etkileşimler",
+          "Fiziksel ve Kimyasal Değişimler"
+        ]},
+        { "name": "Maddenin Halleri", "topics": [
+          "Maddenin Fiziksel Hâlleri",
+          "Plazma"
+        ]},
+        { "name": "Su ve Hayat", "topics": []},
+        { "name": "Doğa ve Kimya", "topics": []}
+      ]
+    },
+    {
+      "name": "Biyoloji",
+      "slug": "biyoloji",
+      "units": [
+        { "name": "Yaşam Bilimi Biyoloji", "topics": [
+          "Canlıların Ortak Özellikleri",
+          "Canlıların Yapısında Bulunan Temel Bileşikler"
+        ]},
+        { "name": "Hücre Yapısı", "topics": [
+          "Hücrenin Yapısı",
+          "Hücrenin Kısımları"
+        ]},
+        { "name": "Canlılar Dünyası", "topics": [
+          "Canlıların Çeşitliliği ve Sınıflandırılması",
+          "Canlı Alemleri ve Özellikleri"
+        ]}
+      ]
+    },
+    {
+      "name": "Tarih",
+      "slug": "tarih",
+      "units": [
+        { "name": "Tarih ve Zaman", "topics": []},
+        { "name": "İnsanlığın İlk Dönemleri", "topics": []},
+        { "name": "Orta Çağ'da Dünya", "topics": []},
+        { "name": "İlk ve Orta Çağlarda Türk Dünyası", "topics": []},
+        { "name": "İslam Medeniyetinin Doğuşu", "topics": []},
+        { "name": "Türklerin İslamiyeti Kabulü ve İlk Türk-İslam Devletleri", "topics": []}
+      ]
+    },
+    {
+      "name": "Edebiyat",
+      "slug": "edebiyat",
+      "units": [
+        { "name": "Edebiyat Nedir", "topics": []},
+        { "name": "Edebiyatın Bilimle ve Güzel Sanatlarla İlişkisi", "topics": []},
+        { "name": "Metinlerin Sınıflandırılması", "topics": []},
+        { "name": "İletişim ve Dil", "topics": []},
+        { "name": "Yazım Kuralları", "topics": []},
+        { "name": "Noktalama İşaretleri", "topics": []},
+        { "name": "Sözcükler", "topics": ["İsim", "Sıfat", "Edat-Bağlaç-Ünlem", "Zamir", "Zarf", "Fiil"]},
+        { "name": "Metin Türleri", "topics": ["Hikaye", "Şiir", "Masal/Fabl", "Roman", "Tiyatro", "Biyografi/Otobiyografi", "Mektup"]}
+      ]
+    },
+    {
+      "name": "Coğrafya",
+      "slug": "cografya",
+      "units": [
+        { "name": "İnsan ve Doğa Etkileşimi", "topics": []},
+        { "name": "Coğrafyanın Konuları ve Bölümleri", "topics": []},
+        { "name": "Coğrafya Biliminin Gelişimi", "topics": []},
+        { "name": "Dünya'nın Hareketleri", "topics": [
+          "Dünya'nın Şekli ve Sonuçları",
+          "Dünya'nın Günlük Hareketi ve Sonuçları",
+          "Dünya'nın Yıllık Hareketi ve Sonuçları"
+        ]},
+        { "name": "Harita Bilgisi", "topics": ["İzohips Haritası"]},
+        { "name": "Konum", "topics": [
+          "Koordinat Sistemi",
+          "Mutlak ve Göreceli Konum",
+          "Türkiye'nin Konumu",
+          "Türkiye'nin Matematik Konumu ve Sonuçları"
+        ]},
+        { "name": "İklim Bilgisi", "topics": [
+          "Atmosfer",
+          "Hava Durumu ve İklim",
+          "Sıcaklık",
+          "Basınç ve Rüzgarlar",
+          "Nem ve Yağış",
+          "Yeryüzündeki İklim Tipleri"
+        ]},
+        { "name": "Türkiye İklimi", "topics": [
+          "Türkiye'nin İklimini Etkileyen Faktörler",
+          "Türkiye'de İklim Elemanları",
+          "Türkiye'de Görülen İklim Tipleri"
+        ]},
+        { "name": "Yerleşme", "topics": [
+          "Yerleşmelerin Gelişimi",
+          "Yerleşme Doku ve Tipleri",
+          "Türkiye'de Yerleşmelerin Gelişimi ve Fonksiyonel Özellikleri",
+          "Türkiye'den ve Dünya'dan Bölge Türleri",
+          "İnsanların Doğal Çevreyi Kullanma Biçimleri"
+        ]}
+      ]
+    },
+    {
+      "name": "Din Kültürü",
+      "slug": "din-kulturu",
+      "units": [
+        { "name": "İslam İnancı", "topics": [
+          "İslam'da Bilgi Kaynakları",
+          "İslam İnancında İmanın Mahiyeti",
+          "İman-Tasdik İlişkisi",
+          "İman-İkrar İlişkisi",
+          "İman ve İslam İlişkisi",
+          "İslam İnanç Esaslarının Özellikleri"
+        ]},
+        { "name": "İbadet", "topics": [
+          "İslam'da İbadet ve Kapsamı",
+          "İslam'da İbadetin Amacı ve Önemi",
+          "İslam'da İbadet Yükümlülüğü",
+          "İslam'da İbadetlerin Temel İlkeleri: Kur'an ve Sünnete Uygunluk",
+          "İslamda İbadetin Temel İlkeleri: Niyet ve İhlas",
+          "İslam'da İbadet Ahlak İlişkisi"
+        ]},
+        { "name": "Değerler", "topics": [
+          "Değerler ve Değerlerin Kaynağı",
+          "Gençlerin Kişilik Gelişiminde Değerlerin Yeri ve Önemi",
+          "Temel Değerler",
+          "İnsani Erdem ve Değerler: Hikmet, Adalet, İffet, Şecaat"
+        ]},
+        { "name": "İslam Medeniyeti ve Özellikleri", "topics": []},
+        { "name": "İslam Medeniyetinin Farklı Coğrafyalardaki İzleri", "topics": []}
+      ]
+    },
+    {
+      "name": "İngilizce",
+      "slug": "ingilizce",
+      "units": [
+        { "name": "Studying Abroad", "topics": []},
+        { "name": "My Environment", "topics": []},
+        { "name": "Movies", "topics": []},
+        { "name": "Human in Nature", "topics": []},
+        { "name": "Inspirational people", "topics": []},
+        { "name": "Bridging Cultures", "topics": []},
+        { "name": "World Heritage", "topics": []},
+        { "name": "Emergency and Health Problems", "topics": []},
+        { "name": "Invitations and Celebrations", "topics": []},
+        { "name": "Tv and Social Media", "topics": []}
+      ]
+    },
+    {
+      "name": "Almanca",
+      "slug": "almanca",
+      "units": [
+        { "name": "Themenkreis 1: Informationen zur Person", "topics": []},
+        { "name": "Themenkreis 2: Die Schule", "topics": []},
+        { "name": "Themenkreis 3: Meine Familie", "topics": []},
+        { "name": "Themenkreis 4: Tägliches Leben", "topics": []}
+      ]
+    }
+  ]
+}
+
+

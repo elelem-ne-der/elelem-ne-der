@@ -27,13 +27,13 @@ export default function Home() {
         <div className="text-center">
           <h1 className="text-5xl font-bold text-white mb-6 text-center">
             <span className="inline-flex items-center justify-center">
-              Pusula
               <img 
                 src="/pusula_iconuc.png" 
                 alt="Pusula Logo" 
-                className="ml-3" 
-                style={{ width: '100px', height: '100px', objectFit: 'contain' }} 
+                className="mr-2" 
+                style={{ width: '140px', height: '140px', objectFit: 'contain' }} 
               />
+              Pusula
             </span>
           </h1>
           <p className="text-xl text-gray-600 mb-8">
@@ -56,13 +56,13 @@ export default function Home() {
           </div>
           
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card">
-              <div className="text-4xl mb-4">👨‍🎓</div>
-              <h3 className="text-2xl font-semibold mb-4 card-title-student">Öğrenci</h3>
-              <p className="text-gray-600 mb-6">
+            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card flex flex-col h-full">
+              <div className="text-4xl mb-4 text-center">👨‍🎓</div>
+              <h3 className="text-2xl font-semibold mb-4 card-title-student text-center">Öğrenci</h3>
+              <p className="text-gray-600 mb-6 flex-grow text-center">
                 Ödevlerini çöz, hatalarını öğren, kişisel yol haritanı takip et
               </p>
-              <div className="space-y-3">
+              <div className="space-y-3 mt-auto">
                 <Link
                   href="/student/login"
                   className="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition text-center"
@@ -78,13 +78,13 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card">
-              <div className="text-4xl mb-4">👨‍🏫</div>
-              <h3 className="text-2xl font-semibold mb-4 card-title-teacher">Öğretmen</h3>
-              <p className="text-gray-600 mb-6">
+            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card flex flex-col h-full">
+              <div className="text-4xl mb-4 text-center">👨‍🏫</div>
+              <h3 className="text-2xl font-semibold mb-4 card-title-teacher text-center">Öğretmen</h3>
+              <p className="text-gray-600 mb-6 flex-grow text-center">
                 Ödev oluştur, öğrenci ilerlemesini takip et, raporları incele
               </p>
-              <div className="space-y-3">
+              <div className="space-y-3 mt-auto">
                 <Link
                   href="/teacher/login"
                   className="block w-full bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition text-center"
@@ -100,13 +100,13 @@ export default function Home() {
               </div>
             </div>
             
-            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card">
-              <div className="text-4xl mb-4">👨‍👩‍👧‍👦</div>
-              <h3 className="text-2xl font-semibold mb-4 card-title-parent">Veli</h3>
-              <p className="text-gray-600 mb-6">
+            <div className="bg-white rounded-lg shadow-lg p-8 interactive-card flex flex-col h-full">
+              <div className="text-4xl mb-4 text-center">👨‍👩‍👧‍👦</div>
+              <h3 className="text-2xl font-semibold mb-4 card-title-parent text-center">Veli</h3>
+              <p className="text-gray-600 mb-6 flex-grow text-center">
                 Çocuğunun gelişimini takip et, detaylı raporları görüntüle
               </p>
-              <div className="space-y-3">
+              <div className="space-y-3 mt-auto">
                 <Link
                   href="/parent/login"
                   className="block w-full bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition text-center"

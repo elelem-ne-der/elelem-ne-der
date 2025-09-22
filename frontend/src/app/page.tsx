@@ -30,7 +30,7 @@ export default function Home() {
               <img 
                 src="/pusula_iconuc.png" 
                 alt="Pusula Logo" 
-                className="mr-2" 
+                className="" 
                 style={{ width: '140px', height: '140px', objectFit: 'contain' }} 
               />
               Pusula

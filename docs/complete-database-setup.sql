@@ -31,6 +31,11 @@ DROP TABLE IF EXISTS schools CASCADE;
 DROP TABLE IF EXISTS districts CASCADE;
 DROP TABLE IF EXISTS provinces CASCADE;
 DROP TABLE IF EXISTS tags CASCADE;
+-- Müfredat tabloları (varsa önce sil)
+DROP TABLE IF EXISTS topics CASCADE;
+DROP TABLE IF EXISTS units CASCADE;
+DROP TABLE IF EXISTS subjects CASCADE;
+DROP TABLE IF EXISTS grade_levels CASCADE;
 
 -- =====================================================
 -- 2. TEMEL TABLOLARI OLUŞTUR
@@ -198,6 +203,44 @@ CREATE TABLE tags (
 );
 
 -- =====================================================
+-- 2.b MÜFREDAT TABLOLARI (SINIF/DERS/ÜNİTE/KONU)
+-- =====================================================
+
+-- Sınıf seviyeleri
+CREATE TABLE grade_levels (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE
+);
+
+-- Dersler (sınıf seviyesine bağlı)
+CREATE TABLE subjects (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  grade_level_id BIGINT NOT NULL REFERENCES grade_levels(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  UNIQUE (grade_level_id, slug)
+);
+
+-- Üniteler (derse bağlı)
+CREATE TABLE units (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  subject_id BIGINT NOT NULL REFERENCES subjects(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  order_index INT NOT NULL DEFAULT 0,
+  UNIQUE (subject_id, name)
+);
+
+-- Konular (üniteye bağlı)
+CREATE TABLE topics (
+  id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  unit_id BIGINT NOT NULL REFERENCES units(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  order_index INT NOT NULL DEFAULT 0,
+  keywords TEXT[],
+  description TEXT
+);
+
+-- =====================================================
 -- 3. RLS'Yİ TAMAMEN DEVRE DIŞI BIRAK
 -- =====================================================
 
@@ -216,6 +259,10 @@ ALTER TABLE questions DISABLE ROW LEVEL SECURITY;
 ALTER TABLE student_answers DISABLE ROW LEVEL SECURITY;
 ALTER TABLE analysis_results DISABLE ROW LEVEL SECURITY;
 ALTER TABLE roadmap_steps DISABLE ROW LEVEL SECURITY;
+ALTER TABLE grade_levels DISABLE ROW LEVEL SECURITY;
+ALTER TABLE subjects DISABLE ROW LEVEL SECURITY;
+ALTER TABLE units DISABLE ROW LEVEL SECURITY;
+ALTER TABLE topics DISABLE ROW LEVEL SECURITY;
 
 -- =====================================================
 -- 4. TRIGGER'LARI OLUŞTUR

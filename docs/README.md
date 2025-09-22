@@ -1,14 +1,14 @@
-# Elelem Ne Der - AI Destekli Eğitim Platformu
+# Elelem Ne Der - Öğrenme ve Değerlendirme Platformu
 
 ## 📋 Proje Hakkında
 
-**Elelem Ne Der**, 5-12. sınıf Türk öğrencileri için tasarlanmış yapay zeka destekli kişiselleştirilmiş öğrenme platformudur. Platform, öğrencilerin hatalarını analiz ederek kök nedenleri bulur ve özel öğrenme yol haritaları oluşturur.
+**Elelem Ne Der**, 5-12. sınıf öğrencileri için kişiselleştirilmiş öğrenme ve değerlendirme akışları sunar. Öğrencilerin yanıtlarını işleyip düzenli raporlar ve çalışma önerileri üretir.
 
 ### 🎯 Temel Özellikler
 
-- **AI Destekli Soru Etiketleme**: Sorular otomatik olarak konu ve zorluk seviyesine göre etiketlenir
-- **Akıllı Hata Analizi**: Öğrenci hatalarını analiz ederek temel eksiklikleri tespit eder
-- **Kişiselleştirilmiş Yol Haritası**: Her öğrenci için özel öğrenme planı oluşturur
+- **Otomatik Soru Etiketleme**: Sorular konu ve zorluk seviyesine göre etiketlenir
+- **Hata Analizi**: Öğrenci hataları üzerinden temel eksiklikler tespit edilir
+- **Kişiselleştirilmiş Yol Haritası**: Her öğrenci için özel çalışma planı oluşturulur
 - **Çoklu Kullanıcı Desteği**: Öğrenci, Öğretmen ve Veli rolleri
 
 ### 👥 Kullanıcı Rolleri
@@ -32,9 +32,9 @@
 - **Express.js** - Web framework
 - **Supabase** - Database & Auth
 
-### AI & Deployment
-- **Hugging Face** - AI servisleri (ücretsiz)
-- **Vercel** - Hosting platformu
+### Metin İşleme & Dağıtım
+- **Gemini API (ai.google.dev)** - Metin üretimi ve sınırlı ücretsiz kullanım
+- **Vercel** - Hosting
 
 ## 🚀 Hızlı Başlangıç
 
@@ -77,7 +77,6 @@ cd frontend && npm run dev
 4. **Project Settings** → **Environment Variables** kısmında:
    - `NEXT_PUBLIC_SUPABASE_URL`
    - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-   - `NEXT_PUBLIC_ADMIN_API_KEY`
    - `NEXT_PUBLIC_API_URL` (Backend URL'iniz)
 
 #### Backend Deploy
@@ -92,6 +91,8 @@ cd frontend && npm run dev
    - `ADMIN_USERNAME`
    - `ADMIN_PASSWORD`
    - `JWT_SECRET`
+   - `GEMINI_API_KEY`
+   - `GEMINI_MODEL` (örn. `gemini-1.5-flash`)
 
 **🌐 Production URL'lerinizden uygulamaya erişin.**
 
@@ -102,10 +103,11 @@ cd frontend && npm run dev
 - `GET /api/questions/:assignmentId` - Soru listesi
 - `GET /api/status` - Sistem durumu
 
-### AI Endpoints
-- `POST /api/tag-question` - Soru etiketleme
-- `POST /api/generate-questions` - Soru üretimi
-- `POST /api/analyze-results` - Hata analizi
+### Metin/Analiz Endpoints
+- `POST /api/ai/complete` - Metin üretimi (Gemini)
+- `POST /api/tag-question` - Soru etiketleme (kural tabanlı)
+- `POST /api/generate-questions` - Örnek soru üretimi (dummy)
+- `POST /api/analyze-results` - Hata analizi (kural tabanlı)
 
 ## 📁 Proje Yapısı
 

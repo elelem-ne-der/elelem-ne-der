@@ -205,21 +205,19 @@ async function createStudentManually(supabase, student, userId) {
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS configuration for production
+// CORS configuration with optional whitelist via ALLOWED_ORIGINS (comma-separated)
+const allowedOriginsEnv = process.env.ALLOWED_ORIGINS || '';
+const allowedOrigins = allowedOriginsEnv
+  .split(',')
+  .map(o => o.trim())
+  .filter(Boolean);
+
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
-
-    // Allow localhost for development
     if (origin.includes('localhost')) return callback(null, true);
-
-    // Allow Vercel domains (for production)
     if (origin.includes('vercel.app')) return callback(null, true);
-
-    // Allow your custom domain (when you have one)
-    // if (origin.includes('yourdomain.com')) return callback(null, true);
-
+    if (allowedOrigins.length > 0 && allowedOrigins.includes(origin)) return callback(null, true);
     return callback(new Error('Not allowed by CORS'));
   },
   credentials: true
@@ -294,7 +292,6 @@ app.get('/api/status', (req, res) => {
     timestamp: new Date().toISOString(),
     services: {
       supabase: process.env.SUPABASE_URL ? 'bağlı' : 'bağlı değil',
-      ai_hf: process.env.HUGGINGFACE_API_KEY ? 'bağlı' : 'bağlı değil',
       ai_gemini: process.env.GEMINI_API_KEY ? 'bağlı' : 'bağlı değil'
     }
   });
@@ -687,7 +684,9 @@ app.post('/api/ai/complete', async (req, res) => {
     res.json({ text, model: model || GEMINI_DEFAULT_MODEL });
   } catch (error) {
     console.error('Error in /api/ai/complete:', error);
-    res.status(500).json({ error: 'AI completion failed', details: error.message });
+    const message = (error && error.message) || 'AI completion failed';
+    const isQuota = message.toLowerCase().includes('quota') || message.toLowerCase().includes('rate');
+    res.status(isQuota ? 429 : 500).json({ error: isQuota ? 'Quota exceeded' : 'AI completion failed', details: message });
   }
 });
 

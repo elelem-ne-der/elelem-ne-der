@@ -13,7 +13,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@huggingface/inference": "^4.8.0",
     "@google/generative-ai": "^0.21.0",
     "@supabase/supabase-js": "^2.57.4",
     "bcryptjs": "^2.4.3",

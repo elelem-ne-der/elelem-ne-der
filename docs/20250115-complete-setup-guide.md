@@ -4,7 +4,7 @@
 
 ## 🎯 Proje Özeti
 
-**Elelem Ne Der**, 5-12. sınıf Türk öğrencileri için tasarlanmış yapay zeka destekli kişiselleştirilmiş öğrenme platformudur. Platform, öğrencilerin hatalarını analiz ederek kök nedenleri bulur ve özel öğrenme yol haritaları oluşturur.
+**Elelem Ne Der**, 5-12. sınıf öğrencileri için kişiselleştirilmiş öğrenme akışları sunar. Öğrenci cevaplarını işler, raporlar ve çalışma önerileri üretir.
 
 ## 🚀 Hızlı Kurulum
 
@@ -142,6 +142,7 @@ git push origin main
 | `/api/admin/login` | POST | Admin girişi |
 | `/api/admin/bulk-import` | POST | Toplu veri girişi |
 | `/api/test/auth-access` | POST | Auth erişim testi |
+| `/api/ai/complete` | POST | Metin üretimi (Gemini) |
 
 ### Frontend Sayfaları
 

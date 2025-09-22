@@ -1,8 +1,8 @@
-# Elelem Ne Der - AI Destekli Eğitim Platformu
+# Elelem Ne Der - Öğrenme ve Değerlendirme Platformu
 
 ## 📋 Proje Genel Bakış
 
-**Elelem Ne Der**, 5-12. sınıf Türk öğrencileri için tasarlanmış yapay zeka destekli kişiselleştirilmiş öğrenme platformudur. Platform, öğrencilerin hatalarını analiz ederek kök nedenleri bulur ve özel öğrenme yol haritaları oluşturur.
+**Elelem Ne Der**, 5-12. sınıf öğrencileri için kişiselleştirilmiş öğrenme akışları sunar. Yanıt verilerini işler, raporlar ve çalışma önerileri üretir.
 
 ### 🎯 Temel Özellikler
 
@@ -31,7 +31,7 @@
 - **Node.js** - Runtime
 - **Express.js** - Web framework
 - **Supabase** - Database & Auth
-- **Hugging Face** - AI servisleri (ücretsiz)
+- **Gemini API (ai.google.dev)** - Metin üretimi (sınırlı ücretsiz kullanım)
 
 ### Database & Auth
 - **Supabase** (PostgreSQL) - Veritabanı
@@ -129,7 +129,8 @@ npm install
 SUPABASE_URL=your_supabase_url
 SUPABASE_ANON_KEY=your_supabase_anon_key
 SUPABASE_SERVICE_KEY=your_supabase_service_key
-HUGGINGFACE_API_KEY=your_huggingface_key
+GEMINI_API_KEY=your_gemini_api_key
+GEMINI_MODEL=gemini-1.5-flash
 
 # Frontend (.env.local)
 NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
@@ -160,10 +161,11 @@ npm run dev
 - `GET /api/questions/:assignmentId` - Soru listesi
 - `GET /api/status` - Sistem durumu
 
-### AI Endpoints
-- `POST /api/tag-question` - Soru etiketleme
-- `POST /api/generate-questions` - Soru üretme
-- `POST /api/analyze-results` - Hata analizi
+### Metin/Analiz Endpoints
+- `POST /api/ai/complete` - Metin üretimi (Gemini)
+- `POST /api/tag-question` - Soru etiketleme (kural tabanlı)
+- `POST /api/generate-questions` - Örnek soru üretimi (dummy)
+- `POST /api/analyze-results` - Hata analizi (kural tabanlı)
 
 ### Admin Endpoints
 - `POST /api/admin/seed-data` - Tekli veri girişi
@@ -191,13 +193,12 @@ npm run dev
 
 ### Ücretsiz Servisler
 - **Supabase** - Database & Auth (ücretsiz katman)
-- **Hugging Face** - AI servisleri (ücretsiz API)
+- **Gemini API** - Sınırlı ücretsiz kullanım
 - **Vercel** - Deployment (ücretsiz katman)
 
-### Yapay Zeka Entegrasyonu
-- Soru etiketleme için Hugging Face transformers
-- Hata analizi için metin işleme modelleri
-- Kişiselleştirilmiş öneri sistemi
+### Metin İşleme Entegrasyonu
+- `@google/generative-ai` ile metin üretimi
+- Kural tabanlı etiketleme ve analiz yardımcıları
 
 ### Güvenlik
 - Row Level Security (RLS) aktif
@@ -248,5 +249,5 @@ Bu proje eğitim amaçlı geliştirilmiştir.
 
 ---
 
-**Son Güncelleme:** 21 Eylül 2025
-**Versiyon:** 1.1.0
+**Son Güncelleme:** 22 Eylül 2025
+**Versiyon:** 1.2.0

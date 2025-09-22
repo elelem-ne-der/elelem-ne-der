@@ -14,7 +14,7 @@ export default function TestPage() {
   const testBackend = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/assignments');
+      const response = await fetch('/api/backend/api/assignments');
       const data = await response.json();
       setTestResult({ success: true, data });
     } catch (error) {
@@ -28,14 +28,14 @@ export default function TestPage() {
     setLoading(true);
     try {
       // Önce basit bir test yapalım
-      const response = await fetch('http://localhost:3001/api/status');
+      const response = await fetch('/api/backend/api/status');
 
       if (!response.ok) {
         throw new Error(`Backend çalışmıyor! Status: ${response.status}`);
       }
 
       // AI endpoint'ini test et
-      const aiResponse = await fetch('http://localhost:3001/api/tag-question', {
+      const aiResponse = await fetch('/api/backend/api/tag-question', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export default function TestPage() {
   const testAdminDataEntry = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:3001/api/admin/seed-data', {
+      const response = await fetch('/api/backend/api/admin/seed-data', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -133,7 +133,7 @@ export default function TestPage() {
         ]
       };
 
-      const response = await fetch('http://localhost:3001/api/admin/bulk-import', {
+      const response = await fetch('/api/backend/api/admin/bulk-import', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

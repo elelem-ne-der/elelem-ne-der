@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface ImportResult {
   success: boolean;
@@ -11,6 +12,7 @@ interface ImportResult {
 }
 
 export default function BulkImportPage() {
+  const { getAccessToken } = useAuth();
   const [importType, setImportType] = useState<'students' | 'teachers'>('students');
   const [jsonData, setJsonData] = useState('');
   const [loading, setLoading] = useState(false);
@@ -33,12 +35,18 @@ export default function BulkImportPage() {
         throw new Error('JSON array formatında olmalı');
       }
 
+      // JWT token al
+      const token = await getAccessToken();
+      if (!token) {
+        throw new Error('Giriş yapmanız gerekiyor. Lütfen admin paneline giriş yapın.');
+      }
+
       // Backend server kontrolü
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/admin/bulk-import`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': process.env.NEXT_PUBLIC_ADMIN_API_KEY || '',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           dataType: importType,
@@ -100,7 +108,7 @@ export default function BulkImportPage() {
       ],
       teachers: [
         {
-          teacher_number: 'OGR001',
+          teacher_number: 'OGRT001',
           first_name: 'Mehmet',
           last_name: 'Hoca',
           middle_name: '',
@@ -111,7 +119,7 @@ export default function BulkImportPage() {
           contact_phone: '05551234567'
         },
         {
-          teacher_number: 'OGR002',
+          teacher_number: 'OGRT002',
           first_name: 'Ayşe',
           last_name: 'Öğretmen',
           middle_name: 'Nur',
@@ -163,7 +171,7 @@ export default function BulkImportPage() {
       ],
       teachers: [
         {
-          teacher_number: 'OGR001',
+          teacher_number: 'OGRT001',
           first_name: 'Mehmet',
           last_name: 'Hoca',
           middle_name: '',
@@ -174,7 +182,7 @@ export default function BulkImportPage() {
           contact_phone: '05551234567'
         },
         {
-          teacher_number: 'OGR002',
+          teacher_number: 'OGRT002',
           first_name: 'Ayşe',
           last_name: 'Öğretmen',
           middle_name: 'Nur',
@@ -266,7 +274,7 @@ export default function BulkImportPage() {
                   school_type: 'ortaokul',
                   school_name: 'Kadıköy Ortaokulu'
                 } : {
-                  teacher_number: 'OGR001',
+                  teacher_number: 'OGRT001',
                   first_name: 'Mehmet',
                   last_name: 'Hoca',
                   middle_name: '',

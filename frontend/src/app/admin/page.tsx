@@ -2,22 +2,23 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function AdminDashboard() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { user, loading: authLoading, signIn, signOut } = useAuth();
   const [showLogin, setShowLogin] = useState(true);
-  const [loginData, setLoginData] = useState({ username: '', password: '' });
+  const [loginData, setLoginData] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
     // Check if user is already logged in
-    const token = localStorage.getItem('admin_token');
-    if (token) {
-      setIsAuthenticated(true);
+    if (user) {
       setShowLogin(false);
+    } else {
+      setShowLogin(true);
     }
-  }, []);
+  }, [user]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,49 +26,37 @@ export default function AdminDashboard() {
     setError('');
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      console.log('API URL:', apiUrl);
-
-      const response = await fetch(`${apiUrl}/api/admin/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(loginData),
-      });
-
-      console.log('Response status:', response.status);
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.log('Error response:', errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      const result = await response.json();
-      console.log('Login result:', result);
-
-      if (result.success) {
-        localStorage.setItem('admin_token', result.token);
-        setIsAuthenticated(true);
-        setShowLogin(false);
-      } else {
-        setError(result.error || 'Login failed');
-      }
+      // Supabase ile giriş yap
+      await signIn(loginData.email, loginData.password);
+      setShowLogin(false);
     } catch (error) {
       console.error('Login error:', error);
-      setError(error instanceof Error ? error.message : 'Connection failed');
+      setError(error instanceof Error ? error.message : 'Giriş başarısız');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('admin_token');
-    setIsAuthenticated(false);
-    setShowLogin(true);
-    setLoginData({ username: '', password: '' });
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      setShowLogin(true);
+      setLoginData({ email: '', password: '' });
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (showLogin) {
     return (
@@ -81,15 +70,15 @@ export default function AdminDashboard() {
           <form onSubmit={handleLogin} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Kullanıcı Adı
+                E-posta
               </label>
               <input
-                type="text"
+                type="email"
                 required
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 bg-white"
-                value={loginData.username}
-                onChange={(e) => setLoginData({...loginData, username: e.target.value})}
-                placeholder="admin"
+                value={loginData.email}
+                onChange={(e) => setLoginData({...loginData, email: e.target.value})}
+                placeholder="admin@example.com"
               />
             </div>
 
@@ -123,9 +112,10 @@ export default function AdminDashboard() {
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-500">
-            <p>Varsayılan giriş bilgileri:</p>
-            <p><strong>Kullanıcı:</strong> admin</p>
-            <p><strong>Şifre:</strong> admin123</p>
+            <p>Admin hesabı oluşturmak için:</p>
+            <p>1. Supabase Dashboard'a gidin</p>
+            <p>2. Authentication &gt; Users &gt; Add User</p>
+            <p>3. E-posta ve şifre ile admin hesabı oluşturun</p>
           </div>
         </div>
       </div>

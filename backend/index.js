@@ -5,6 +5,202 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const supabase = require('./lib/supabase');
 const { tagQuestion, generateQuestions, analyzeResults } = require('./lib/ai');
+const { generateText: generateTextWithGemini, defaultModel: GEMINI_DEFAULT_MODEL } = require('./lib/gemini');
+
+// Manuel öğretmen oluşturma fonksiyonu (Auth.users bypass)
+async function createTeacherManually(supabase, teacher, userId) {
+  try {
+    console.log('Creating teacher without auth user:', teacher.teacher_number);
+    
+    // 1. District bul veya oluştur
+    let districtId;
+    const { data: existingDistrict } = await supabase
+      .from('districts')
+      .select('id')
+      .eq('name', teacher.district)
+      .single();
+
+    if (existingDistrict) {
+      districtId = existingDistrict.id;
+      console.log('Using existing district:', teacher.district);
+    } else {
+      console.log('Creating new district:', teacher.district);
+      const { data: newDistrict, error: districtError } = await supabase
+        .from('districts')
+        .insert({ name: teacher.district })
+        .select()
+        .single();
+      
+      if (districtError) {
+        console.error('District creation failed:', districtError);
+        throw districtError;
+      }
+      districtId = newDistrict.id;
+    }
+
+    // 2. School oluştur
+    console.log('Creating school:', teacher.school_name);
+    const { data: school, error: schoolError } = await supabase
+      .from('schools')
+      .insert({
+        district_id: districtId,
+        name: teacher.school_name,
+        level: 'ortaokul', // Varsayılan
+        type: 'resmi'
+      })
+      .select()
+      .single();
+
+    if (schoolError) {
+      console.error('School creation failed:', schoolError);
+      throw schoolError;
+    }
+
+    // 3. Profile oluştur (auth_user_id olmadan)
+    console.log('Creating profile for teacher:', teacher.teacher_number);
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: userId,
+        email: teacher.email || `${teacher.teacher_number}@teacher.example.com`,
+        name: `${teacher.first_name} ${teacher.last_name}`,
+        role: 'teacher'
+      })
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error('Profile creation failed:', profileError);
+      throw profileError;
+    }
+
+    // 4. Teacher oluştur
+    console.log('Creating teacher record:', teacher.teacher_number);
+    const { data: teacherData, error: teacherError } = await supabase
+      .from('teachers')
+      .insert({
+        id: userId,
+        teacher_number: teacher.teacher_number,
+        first_name: teacher.first_name,
+        last_name: teacher.last_name,
+        middle_name: teacher.middle_name || null,
+        school_id: school.id,
+        contact_info: [
+          { type: 'email', value: teacher.contact_email || null },
+          { type: 'phone', value: teacher.contact_phone || null }
+        ]
+      })
+      .select()
+      .single();
+
+    if (teacherError) {
+      console.error('Teacher record creation failed:', teacherError);
+      throw teacherError;
+    }
+
+    console.log('Teacher created successfully:', teacherData.teacher_number);
+    return teacherData;
+  } catch (error) {
+    console.error('Manual teacher creation failed:', error);
+    throw error;
+  }
+}
+
+// Manuel öğrenci oluşturma fonksiyonu (Auth.users bypass)
+async function createStudentManually(supabase, student, userId) {
+  try {
+    console.log('Creating student without auth user:', student.student_number);
+    
+    // 1. District bul veya oluştur
+    let districtId;
+    const { data: existingDistrict } = await supabase
+      .from('districts')
+      .select('id')
+      .eq('name', student.district)
+      .single();
+
+    if (existingDistrict) {
+      districtId = existingDistrict.id;
+      console.log('Using existing district:', student.district);
+    } else {
+      console.log('Creating new district:', student.district);
+      const { data: newDistrict, error: districtError } = await supabase
+        .from('districts')
+        .insert({ name: student.district })
+        .select()
+        .single();
+      
+      if (districtError) {
+        console.error('District creation failed:', districtError);
+        throw districtError;
+      }
+      districtId = newDistrict.id;
+    }
+
+    // 2. School oluştur
+    console.log('Creating school:', student.school_name);
+    const { data: school, error: schoolError } = await supabase
+      .from('schools')
+      .insert({
+        district_id: districtId,
+        name: student.school_name,
+        level: student.school_type === 'ortaokul' ? 'ortaokul' : 'lise',
+        type: 'resmi'
+      })
+      .select()
+      .single();
+
+    if (schoolError) {
+      console.error('School creation failed:', schoolError);
+      throw schoolError;
+    }
+
+    // 3. Profile oluştur (auth_user_id olmadan)
+    console.log('Creating profile for student:', student.student_number);
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: userId,
+        email: student.email || `${student.student_number}@student.example.com`,
+        name: `${student.first_name} ${student.last_name}`,
+        role: 'student'
+      })
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error('Profile creation failed:', profileError);
+      throw profileError;
+    }
+
+    // 4. Student oluştur
+    console.log('Creating student record:', student.student_number);
+    const { data: studentData, error: studentError } = await supabase
+      .from('students')
+      .insert({
+        id: userId,
+        student_number: student.student_number,
+        first_name: student.first_name,
+        last_name: student.last_name,
+        middle_name: student.middle_name || null,
+        grade: parseInt(student.grade),
+        school_id: school.id
+      })
+      .select()
+      .single();
+
+    if (studentError) {
+      console.error('Student record creation failed:', studentError);
+      throw studentError;
+    }
+
+    console.log('Student created successfully:', studentData.student_number);
+    return studentData;
+  } catch (error) {
+    console.error('Manual student creation failed:', error);
+    throw error;
+  }
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -98,9 +294,79 @@ app.get('/api/status', (req, res) => {
     timestamp: new Date().toISOString(),
     services: {
       supabase: process.env.SUPABASE_URL ? 'bağlı' : 'bağlı değil',
-      ai: process.env.HUGGINGFACE_API_KEY ? 'bağlı' : 'bağlı değil'
+      ai_hf: process.env.HUGGINGFACE_API_KEY ? 'bağlı' : 'bağlı değil',
+      ai_gemini: process.env.GEMINI_API_KEY ? 'bağlı' : 'bağlı değil'
     }
   });
+});
+
+// Test endpoint - Auth users erişim testi
+app.post('/api/test/auth-access', async (req, res) => {
+  try {
+    const { createClient } = require('@supabase/supabase-js');
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+
+    console.log('Testing auth.users access with service role...');
+
+    // 1. Service role ile auth.users'a erişim testi
+    const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+    
+    if (authError) {
+      console.error('Auth users access failed:', authError);
+      return res.status(500).json({
+        success: false,
+        error: 'Auth users access failed: ' + authError.message,
+        details: authError
+      });
+    }
+
+    console.log('Auth users access successful, found users:', authUsers.users.length);
+
+    // 2. Yeni kullanıcı oluşturma testi
+    const testEmail = `test-${Date.now()}@example.com`;
+    const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+      email: testEmail,
+      password: 'TestPass123!',
+      user_metadata: {
+        full_name: 'Test User',
+        role: 'student'
+      }
+    });
+
+    if (createError) {
+      console.error('User creation failed:', createError);
+      return res.status(500).json({
+        success: false,
+        error: 'User creation failed: ' + createError.message,
+        details: createError
+      });
+    }
+
+    console.log('User created successfully:', newUser.user.id);
+
+    // 3. Oluşturulan kullanıcıyı sil
+    const { error: deleteError } = await supabase.auth.admin.deleteUser(newUser.user.id);
+    if (deleteError) {
+      console.error('User deletion failed:', deleteError);
+    }
+
+    res.json({
+      success: true,
+      message: 'Auth access test successful',
+      details: {
+        existingUsers: authUsers.users.length,
+        testUserCreated: true,
+        testUserDeleted: !deleteError
+      }
+    });
+
+  } catch (error) {
+    console.error('Auth access test error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 // Admin Login
@@ -149,56 +415,24 @@ app.post('/api/admin/seed-data', authenticateToken, async (req, res) => {
     const { type, data } = req.body;
 
     if (type === 'student') {
-      // Önce auth.users'a kullanıcı oluştur (Service Role ile)
+      // Manuel oluşturma fonksiyonunu kullan
       const userId = require('crypto').randomUUID();
-      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
-        id: userId,
-        email: data.email || `${data.student_number}@student.example.com`,
-        password: 'TempPass123!', // Geçici şifre, kullanıcı giriş yapınca değiştirebilir
-        user_metadata: {
-          full_name: `${data.first_name} ${data.last_name}`,
-          role: 'student'
-        }
-      });
-
-      if (authError) throw authError;
-
-      // Okul bilgilerini al (varsayılan okul oluştur)
-      const { data: school, error: schoolError } = await supabase
-        .from('schools')
-        .insert({
-          district_id: data.district_id, // Frontend'den district_id gelmeli
-          name: data.school_name,
-          level: 'ilkokul', // Varsayılan
-          type: 'resmi'
-        })
-        .select()
-        .single();
-
-      if (schoolError) throw schoolError;
-
-      // Öğrenci oluştur
-      const { data: student, error: studentError } = await supabase
-        .from('students')
-        .insert({
-          id: userId, // auth.users'dan gelen ID
-          student_number: data.student_number,
-          first_name: data.first_name,
-          last_name: data.last_name,
-          middle_name: data.middle_name || null,
-          grade: parseInt(data.grade),
-          school_id: school.id
-        })
-        .select()
-        .single();
-
-      if (studentError) throw studentError;
-
-      res.json({
-        success: true,
-        message: 'Öğrenci başarıyla eklendi',
-        data: student
-      });
+      console.log('Creating single student:', data.student_number);
+      
+      try {
+        const result = await createStudentManually(supabase, data, userId);
+        res.json({
+          success: true,
+          message: 'Öğrenci başarıyla eklendi',
+          data: result
+        });
+      } catch (error) {
+        console.error('Single student creation failed:', error);
+        res.status(500).json({
+          success: false,
+          error: error.message
+        });
+      }
 
     } else if (type === 'teacher') {
       // Önce auth.users'a kullanıcı oluştur (Service Role ile)
@@ -215,13 +449,39 @@ app.post('/api/admin/seed-data', authenticateToken, async (req, res) => {
 
       if (authError) throw authError;
 
+      // Önce district'i bul veya oluştur
+      const { data: district, error: districtError } = await supabase
+        .from('districts')
+        .select('id')
+        .eq('name', data.district)
+        .eq('province', data.province)
+        .single();
+
+      let districtId;
+      if (districtError || !district) {
+        // District yoksa oluştur
+        const { data: newDistrict, error: newDistrictError } = await supabase
+          .from('districts')
+          .insert({
+            name: data.district,
+            province: data.province
+          })
+          .select()
+          .single();
+        
+        if (newDistrictError) throw newDistrictError;
+        districtId = newDistrict.id;
+      } else {
+        districtId = district.id;
+      }
+
       // Okul bilgilerini al (varsayılan okul oluştur)
       const { data: school, error: schoolError } = await supabase
         .from('schools')
         .insert({
-          district_id: data.district_id, // Frontend'den district_id gelmeli
+          district_id: districtId,
           name: data.school_name,
-          level: 'ilkokul', // Varsayılan
+          level: 'ortaokul', // Varsayılan
           type: 'resmi'
         })
         .select()
@@ -239,10 +499,10 @@ app.post('/api/admin/seed-data', authenticateToken, async (req, res) => {
           last_name: data.last_name,
           middle_name: data.middle_name || null,
           school_id: school.id,
-          contact_info: JSON.stringify([
-            { type: 'email', value: data.contact_email },
-            { type: 'phone', value: data.contact_phone }
-          ])
+          contact_info: [
+            { type: 'email', value: data.contact_email || null },
+            { type: 'phone', value: data.contact_phone || null }
+          ]
         })
         .select()
         .single();
@@ -270,7 +530,13 @@ app.post('/api/admin/seed-data', authenticateToken, async (req, res) => {
 app.post('/api/admin/bulk-import', authenticateToken, async (req, res) => {
   try {
     const { createClient } = require('@supabase/supabase-js');
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
+    // Service role ile RLS bypass
+    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    });
 
     const { dataType, data } = req.body;
 
@@ -284,111 +550,32 @@ app.post('/api/admin/bulk-import', authenticateToken, async (req, res) => {
     if (dataType === 'students') {
       for (const student of data) {
         try {
-          // Auth kullanıcısı oluştur
           const userId = require('crypto').randomUUID();
-          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
-            id: userId,
-            email: student.email || `${student.student_number}@student.example.com`,
-            password: 'TempPass123!',
-            user_metadata: {
-              full_name: `${student.first_name} ${student.last_name}`,
-              role: 'student'
-            }
-          });
-
-          if (authError) throw authError;
-
-          // Okul bilgilerini al
-          const { data: school, error: schoolError } = await supabase
-            .from('schools')
-            .insert({
-              district_id: student.district_id, // Frontend'den gelmeli
-              name: student.school_name,
-              level: 'ilkokul',
-              type: 'resmi'
-            })
-            .select()
-            .single();
-
-          if (schoolError) throw schoolError;
-
-          // Öğrenci oluştur
-          const { data: result, error } = await supabase
-            .from('students')
-            .insert({
-              id: userId, // auth.users'dan gelen ID
-              student_number: student.student_number,
-              first_name: student.first_name,
-              last_name: student.last_name,
-              middle_name: student.middle_name || null,
-              grade: parseInt(student.grade),
-              school_id: school.id
-            })
-            .select();
-
-          if (error) {
-            errors.push({ student: student.student_number, error: error.message });
-          } else {
-            results.push(result[0]);
-          }
+          console.log('Creating student:', student.student_number, 'ID:', userId);
+          
+          // Manuel oluşturma fonksiyonunu kullan (RLS bypass)
+          const result = await createStudentManually(supabase, student, userId);
+          results.push(result);
+          console.log('Student created successfully:', result.student_number);
+          
         } catch (error) {
+          console.error('Student creation failed:', student.student_number, error.message);
           errors.push({ student: student.student_number, error: error.message });
         }
       }
     } else if (dataType === 'teachers') {
       for (const teacher of data) {
         try {
-          // Auth kullanıcısı oluştur
           const userId = require('crypto').randomUUID();
-          const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
-            id: userId,
-            email: teacher.email || `${teacher.teacher_number}@teacher.example.com`,
-            password: 'TempPass123!',
-            user_metadata: {
-              full_name: `${teacher.first_name} ${teacher.last_name}`,
-              role: 'teacher'
-            }
-          });
-
-          if (authError) throw authError;
-
-          // Okul bilgilerini al
-          const { data: school, error: schoolError } = await supabase
-            .from('schools')
-            .insert({
-              district_id: teacher.district_id, // Frontend'den gelmeli
-              name: teacher.school_name,
-              level: 'ilkokul',
-              type: 'resmi'
-            })
-            .select()
-            .single();
-
-          if (schoolError) throw schoolError;
-
-          // Öğretmen oluştur
-          const { data: result, error } = await supabase
-            .from('teachers')
-            .insert({
-              id: userId, // auth.users'dan gelen ID
-              teacher_number: teacher.teacher_number,
-              first_name: teacher.first_name,
-              last_name: teacher.last_name,
-              middle_name: teacher.middle_name || null,
-              school_id: school.id,
-              contact_info: JSON.stringify([
-                { type: 'email', value: teacher.contact_email },
-                { type: 'phone', value: teacher.contact_phone }
-              ])
-            })
-            .select();
-
-          if (error) {
-            errors.push({ teacher: teacher.teacher_number, error: error.message });
-          } else {
-            results.push(result[0]);
-          }
+          console.log('Creating teacher:', teacher.teacher_number);
+          
+          // Manuel öğretmen oluşturma (auth bypass)
+          const result = await createTeacherManually(supabase, teacher, userId);
+          results.push(result);
+          console.log('Teacher created successfully:', result.teacher_number);
+          
         } catch (error) {
+          console.error('Teacher creation failed:', teacher.teacher_number, error.message);
           errors.push({ teacher: teacher.teacher_number, error: error.message });
         }
       }
@@ -486,6 +673,21 @@ app.post('/api/analyze-results', async (req, res) => {
   } catch (error) {
     console.error('Error in analyze-results:', error);
     res.status(500).json({ error: 'Failed to analyze results' });
+  }
+});
+
+// Gemini AI - simple completion
+app.post('/api/ai/complete', async (req, res) => {
+  try {
+    const { prompt, model, system } = req.body || {};
+    if (!prompt || typeof prompt !== 'string') {
+      return res.status(400).json({ error: 'prompt gerekli' });
+    }
+    const text = await generateTextWithGemini({ prompt, model, system });
+    res.json({ text, model: model || GEMINI_DEFAULT_MODEL });
+  } catch (error) {
+    console.error('Error in /api/ai/complete:', error);
+    res.status(500).json({ error: 'AI completion failed', details: error.message });
   }
 });
 

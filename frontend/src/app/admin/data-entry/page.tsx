@@ -389,7 +389,7 @@ export default function DataEntryPage() {
                     type="text"
                     required
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="Örn: OGR001"
+                    placeholder="Örn: OGRT001"
                     value={teacherForm.teacher_number}
                     onChange={(e) => handleInputChange('teacher', 'teacher_number', e.target.value)}
                   />

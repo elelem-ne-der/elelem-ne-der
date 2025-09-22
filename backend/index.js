@@ -84,10 +84,10 @@ async function createTeacherManually(supabase, teacher, userId) {
         last_name: teacher.last_name,
         middle_name: teacher.middle_name || null,
         school_id: school.id,
-        contact_info: JSON.stringify([
-          { type: 'email', value: teacher.contact_email },
-          { type: 'phone', value: teacher.contact_phone }
-        ])
+        contact_info: [
+          { type: 'email', value: teacher.contact_email || null },
+          { type: 'phone', value: teacher.contact_phone || null }
+        ]
       })
       .select()
       .single();
@@ -497,10 +497,10 @@ app.post('/api/admin/seed-data', authenticateToken, async (req, res) => {
           last_name: data.last_name,
           middle_name: data.middle_name || null,
           school_id: school.id,
-          contact_info: JSON.stringify([
-            { type: 'email', value: data.contact_email },
-            { type: 'phone', value: data.contact_phone }
-          ])
+          contact_info: [
+            { type: 'email', value: data.contact_email || null },
+            { type: 'phone', value: data.contact_phone || null }
+          ]
         })
         .select()
         .single();

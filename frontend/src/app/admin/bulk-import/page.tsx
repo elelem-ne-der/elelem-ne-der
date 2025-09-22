@@ -108,7 +108,7 @@ export default function BulkImportPage() {
       ],
       teachers: [
         {
-          teacher_number: 'OGR001',
+          teacher_number: 'OGRT001',
           first_name: 'Mehmet',
           last_name: 'Hoca',
           middle_name: '',
@@ -119,7 +119,7 @@ export default function BulkImportPage() {
           contact_phone: '05551234567'
         },
         {
-          teacher_number: 'OGR002',
+          teacher_number: 'OGRT002',
           first_name: 'Ayşe',
           last_name: 'Öğretmen',
           middle_name: 'Nur',
@@ -171,7 +171,7 @@ export default function BulkImportPage() {
       ],
       teachers: [
         {
-          teacher_number: 'OGR001',
+          teacher_number: 'OGRT001',
           first_name: 'Mehmet',
           last_name: 'Hoca',
           middle_name: '',
@@ -182,7 +182,7 @@ export default function BulkImportPage() {
           contact_phone: '05551234567'
         },
         {
-          teacher_number: 'OGR002',
+          teacher_number: 'OGRT002',
           first_name: 'Ayşe',
           last_name: 'Öğretmen',
           middle_name: 'Nur',
@@ -274,7 +274,7 @@ export default function BulkImportPage() {
                   school_type: 'ortaokul',
                   school_name: 'Kadıköy Ortaokulu'
                 } : {
-                  teacher_number: 'OGR001',
+                  teacher_number: 'OGRT001',
                   first_name: 'Mehmet',
                   last_name: 'Hoca',
                   middle_name: '',

@@ -2,11 +2,12 @@ import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
 let _supabase: SupabaseClient | null = null;
 
-if (supabaseUrl && supabaseAnonKey) {
-  _supabase = createClient(supabaseUrl, supabaseAnonKey, {
+if (isSupabaseConfigured) {
+  _supabase = createClient(supabaseUrl as string, supabaseAnonKey as string, {
     auth: {
       autoRefreshToken: true,
       persistSession: true,
@@ -22,6 +23,14 @@ if (supabaseUrl && supabaseAnonKey) {
       onAuthStateChange: (_cb: any) => {
         return { data: null, subscription: { unsubscribe: () => {} } };
       },
+      // Provide friendly error methods to avoid undefined function crashes
+      signInWithPassword: async () => {
+        throw new Error('Supabase yapılandırılmamış: NEXT_PUBLIC_SUPABASE_URL ve NEXT_PUBLIC_SUPABASE_ANON_KEY ayarlanmalı.');
+      },
+      signUp: async () => {
+        throw new Error('Supabase yapılandırılmamış: NEXT_PUBLIC_SUPABASE_URL ve NEXT_PUBLIC_SUPABASE_ANON_KEY ayarlanmalı.');
+      },
+      signOut: async () => ({ error: null }),
     },
   } as unknown as SupabaseClient;
 }

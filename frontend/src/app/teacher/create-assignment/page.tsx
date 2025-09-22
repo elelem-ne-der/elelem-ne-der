@@ -98,6 +98,11 @@ export default function CreateAssignment() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-6 bg-green-50 border border-green-200 rounded-md p-4">
+          <p className="text-sm text-green-800">
+            Yapay Zeka, girdiğiniz sınıf/ders/konu ve soru sayısına göre soru seti üretir. Öğrenciler çözdükten sonra sonuçları analiz ederek zayıf/kuvvetli konu özetlerini ve tekrar önerilerini panellere yansıtır.
+          </p>
+        </div>
         <form onSubmit={handleSubmit} className="bg-white shadow rounded-lg p-6">
           <div className="grid md:grid-cols-2 gap-6">
             {/* Title */}

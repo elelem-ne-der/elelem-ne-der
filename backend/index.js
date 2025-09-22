@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const supabase = require('./lib/supabase');
 const { tagQuestion, generateQuestions, analyzeResults } = require('./lib/ai');
+const { generateText: generateTextWithGemini, defaultModel: GEMINI_DEFAULT_MODEL } = require('./lib/gemini');
 
 // Manuel öğretmen oluşturma fonksiyonu (Auth.users bypass)
 async function createTeacherManually(supabase, teacher, userId) {
@@ -293,7 +294,8 @@ app.get('/api/status', (req, res) => {
     timestamp: new Date().toISOString(),
     services: {
       supabase: process.env.SUPABASE_URL ? 'bağlı' : 'bağlı değil',
-      ai: process.env.HUGGINGFACE_API_KEY ? 'bağlı' : 'bağlı değil'
+      ai_hf: process.env.HUGGINGFACE_API_KEY ? 'bağlı' : 'bağlı değil',
+      ai_gemini: process.env.GEMINI_API_KEY ? 'bağlı' : 'bağlı değil'
     }
   });
 });
@@ -671,6 +673,21 @@ app.post('/api/analyze-results', async (req, res) => {
   } catch (error) {
     console.error('Error in analyze-results:', error);
     res.status(500).json({ error: 'Failed to analyze results' });
+  }
+});
+
+// Gemini AI - simple completion
+app.post('/api/ai/complete', async (req, res) => {
+  try {
+    const { prompt, model, system } = req.body || {};
+    if (!prompt || typeof prompt !== 'string') {
+      return res.status(400).json({ error: 'prompt gerekli' });
+    }
+    const text = await generateTextWithGemini({ prompt, model, system });
+    res.json({ text, model: model || GEMINI_DEFAULT_MODEL });
+  } catch (error) {
+    console.error('Error in /api/ai/complete:', error);
+    res.status(500).json({ error: 'AI completion failed', details: error.message });
   }
 });
 

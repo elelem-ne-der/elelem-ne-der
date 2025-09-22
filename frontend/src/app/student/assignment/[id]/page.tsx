@@ -205,6 +205,11 @@ export default function AssignmentPage() {
               ></div>
             </div>
           </div>
+          <div className="mt-4 bg-blue-50 border border-blue-200 rounded-md p-4">
+            <p className="text-sm text-blue-800">
+              Yapay Zeka, bitirdiğinde cevaplarını analiz ederek zayıf/kuvvetli konuları ve çalışma önerilerini çıkarır. Soruda takılırsan öncelikle dene; teslimden sonra açıklamalar ve öneriler panelinde gözükecek.
+            </p>
+          </div>
         </div>
       </div>
 

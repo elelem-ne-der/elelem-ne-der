@@ -93,6 +93,11 @@ body::after {
   z-index: 1;
 }
 
+/* Contrast guard: default readable text on light surfaces */
+.bg-white, .bg-gray-50, .bg-gray-100 {
+  color: #111827; /* gray-900 */
+}
+
 /* Animated background: pulse between white and a very light gray */
 .animated-bg {
   background-color: transparent;

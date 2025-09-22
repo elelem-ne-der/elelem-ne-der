@@ -146,6 +146,18 @@ export default function AdminDashboard() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 bg-white border border-indigo-200 rounded-lg p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 mb-3">Yapay Zeka nasıl kullanılıyor?</h2>
+          <p className="text-gray-700 mb-3">Sistem, ödev sonuçlarını analiz ederek zayıf/kuvvetli konuları ve tekrar önerilerini üretir.</p>
+          <ol className="list-decimal list-inside space-y-2 text-gray-700">
+            <li>Öğretmen ödev oluşturur, öğrenciler çözer.</li>
+            <li>Sonuçlar AI ile analiz edilir; panellere yansır.</li>
+            <li>Admin, test için "API Test Paneli"ni kullanabilir.</li>
+          </ol>
+          <div className="mt-4">
+            <Link href="/test" className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">API Test Paneli</Link>
+          </div>
+        </div>
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Veri Yönetimi</h2>
           <p className="text-gray-600">Öğrenci ve öğretmen verilerini yönetin</p>

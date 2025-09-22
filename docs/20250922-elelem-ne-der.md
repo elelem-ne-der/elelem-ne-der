@@ -28,6 +28,50 @@ curl -X POST http://localhost:3001/api/ai/complete \
 - Ücretsiz kota ile çalışır; kota dolarsa istekler hata dönebilir.
 - Production dağıtımında Vercel ortam değişkenlerine `GEMINI_API_KEY` eklenmelidir.
 
+# 2025-09-22 — Yapay Zeka Özelliklerinin Kullanımı (UI Rehberleri)
+
+Bu güncelleme ile panellere "Nasıl kullanılır?" blokları eklendi. Kod/endpoint bilmeden kullanabilirsiniz.
+
+- Öğretmen Paneli (`/teacher/dashboard`):
+  - "Yeni Ödev Oluştur" ile sınıf/ders/konu ve soru sayısını girin.
+  - AI, soru setini oluşturur; çözümlerden sonra zayıf/kuvvetli konu özetleri dashboard'da görünür.
+
+- Yeni Ödev Sayfası (`/teacher/create-assignment`):
+  - Form üstünde AI bilgilendirme kutusu gösterilir.
+  - Ödev hedefi seçimi: Tüm sınıf, Şube (örn: 8-A) veya Seçili Öğrenciler.
+  - Seçili öğrencileri e-posta veya okul numarasıyla virgül/satır ayırarak girin.
+
+- Öğrenci Paneli (`/student/dashboard`):
+  - Üstte kullanım rehberi; "Ödevlere Git" ile atanmış ödevler listesine atlar.
+
+- Ödev Çözme (`/student/assignment/[id]`):
+  - Üstte AI yardım kutusu; teslimden sonra analiz sonuçları (zayıf/kuvvetli konular + öneriler) görünür.
+
+- Veli Paneli (`/parent/dashboard`):
+  - AI analizi ile özet ve "Detaylı Raporlar" bağlantısı gösterilir.
+
+- Admin Paneli (`/admin`):
+  - AI akışı özetlenir; test için "API Test Paneli" bağlantısı bulunur.
+
+Not: Üretim ve yerelde AI'nın çalışması için backend'in ve `GEMINI_API_KEY`'in aktif olması gerekir. Frontend proxy ile istekler `/api/backend/...` üzerinden yönlendirilir.
+
+### Öğretmen Girişi (Supabase) Sorun Giderme
+
+Giriş olmuyorsa aşağıdakileri kontrol edin:
+
+1) Frontend ortam değişkenleri (`frontend/.env.local`):
+```
+NEXT_PUBLIC_SUPABASE_URL=...your supabase url...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...your supabase anon key...
+```
+Kaydedip frontend'i yeniden başlatın.
+
+2) Supabase Auth kullanıcı kaydı: Supabase Dashboard → Authentication → Users içinde öğretmen e-postası görünüyor olmalı.
+
+3) Mail onayı açık ise: Kullanıcının mail onayını tamamlayın ya da Supabase'de "Confirm user" yapın.
+
+4) Hâlâ olmuyorsa: Tarayıcı Konsolu'ndaki hata mesajını bize iletin (uygulama artık eksik konfigurasyonda kırmızı uyarı gösterir).
+
 # 2025-09-22 Elelem Ne Der - Uygulama Günlüğü
 
 - Yapılan: Backend `teachers.contact_info` artık JSON array olarak kaydediliyor (string değil).

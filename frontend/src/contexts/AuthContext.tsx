@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react';
 import { User } from '@supabase/supabase-js';
-import { supabase } from '@/lib/supabase';
+import { supabase, isSupabaseConfigured } from '@/lib/supabase';
 
 interface AuthContextType {
   user: User | null;
@@ -18,8 +18,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [configError, setConfigError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setConfigError('Giriş yapılamıyor: Supabase yapılandırılmamış. Lütfen .env.local içine NEXT_PUBLIC_SUPABASE_URL ve NEXT_PUBLIC_SUPABASE_ANON_KEY ekleyin.');
+      setLoading(false);
+      return;
+    }
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -38,6 +44,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase yapılandırması eksik. Ortam değişkenlerini ayarlayın.');
+    }
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
@@ -46,6 +55,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, userData: Record<string, any>) => {
+    if (!isSupabaseConfigured) {
+      throw new Error('Supabase yapılandırması eksik. Ortam değişkenlerini ayarlayın.');
+    }
     const { error } = await supabase.auth.signUp({
       email,
       password,
@@ -75,7 +87,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getAccessToken,
   };
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={value}>
+      {configError ? (
+        <div className="min-h-screen bg-red-50 text-red-800 flex items-center justify-center p-6">
+          <div className="max-w-xl">
+            <h2 className="text-xl font-semibold mb-2">Yapılandırma Hatası</h2>
+            <p className="mb-2">{configError}</p>
+            <pre className="bg-white border border-red-200 rounded p-3 text-sm overflow-auto">{`frontend/.env.local\nNEXT_PUBLIC_SUPABASE_URL=...\nNEXT_PUBLIC_SUPABASE_ANON_KEY=...`}</pre>
+          </div>
+        </div>
+      ) : (
+        children
+      )}
+    </AuthContext.Provider>
+  );
 }
 
 export function useAuth() {

@@ -88,6 +88,17 @@ export default function ParentDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 bg-white border border-purple-200 rounded-lg p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 mb-3">Nasıl kullanılır? (Yapay Zeka)</h2>
+          <ul className="list-disc list-inside space-y-2 text-gray-700">
+            <li>Çocuğun zayıf/kuvvetli konuları AI analizi ile özetlenir.</li>
+            <li>"Detaylı Raporlar" bölümünde konu bazlı önerileri görebilirsiniz.</li>
+            <li>Önerilere göre tekrar ödevleri talep edin; gelişimi takip edin.</li>
+          </ul>
+          <div className="mt-4">
+            <Link href="/parent/reports" className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">Detaylı Raporlara Git</Link>
+          </div>
+        </div>
         {/* Children Selector */}
         <div className="mb-8">
           <h2 className="text-xl font-semibold text-gray-900 mb-4">Çocuk Seçimi</h2>

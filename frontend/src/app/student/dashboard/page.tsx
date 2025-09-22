@@ -102,6 +102,20 @@ export default function StudentDashboard() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 bg-white border border-blue-200 rounded-lg p-6 shadow-sm">
+          <h2 className="text-xl font-semibold text-gray-900 mb-3">Nasıl kullanılır?</h2>
+          <ol className="list-decimal list-inside space-y-2 text-gray-700">
+            <li>Atanan ödevlere gir ve soruları çöz.</li>
+            <li>Çözüm sonrası hatalarını ve doğru cevapları incele.</li>
+            <li>Zayıf konularını takip et, güçlendirmek için tekrar çöz.</li>
+            <li>Hedef puan belirle ve ilerlemeni bu panelden takip et.</li>
+          </ol>
+          <div className="mt-4">
+            <a href="#assignments" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+              Ödevlere Git
+            </a>
+          </div>
+        </div>
         {/* Performance Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
@@ -192,7 +206,7 @@ export default function StudentDashboard() {
           </div>
         )}
 
-        <div className="mb-8">
+        <div id="assignments" className="mb-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Atanan Ödevler</h2>
           <p className="text-gray-600">Öğretmeninizin size verdiği ödevleri buradan çözebilirsiniz.</p>
         </div>

@@ -16,6 +16,7 @@ interface Assignment {
 export default function TeacherDashboard() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<{ grade: string; subject: string }>({ grade: '', subject: '' });
 
   useEffect(() => {
     fetchAssignments();
@@ -108,6 +109,29 @@ export default function TeacherDashboard() {
             </Link>
           </div>
         </div>
+        <div className="mb-6 bg-white border border-gray-200 rounded-lg p-4">
+          <div className="grid md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm text-gray-600 mb-2">Sınıf Filtresi</label>
+              <select value={filter.grade} onChange={(e) => setFilter(prev => ({ ...prev, grade: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Tümü</option>
+                {[5,6,7,8,9,10,11,12].map(g => (
+                  <option key={g} value={String(g)}>{g}. Sınıf</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-600 mb-2">Ders Filtresi</label>
+              <select value={filter.subject} onChange={(e) => setFilter(prev => ({ ...prev, subject: e.target.value }))} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <option value="">Tümü</option>
+                {['Matematik','Türkçe','Fen Bilimleri','Sosyal Bilgiler','İngilizce','Din Kültürü'].map(s => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+
         <div className="grid md:grid-cols-3 gap-8 mb-8">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
@@ -171,7 +195,10 @@ export default function TeacherDashboard() {
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {assignments.map((assignment) => (
+            {assignments
+              .filter(a => (filter.grade ? String(a.grade) === filter.grade : true))
+              .filter(a => (filter.subject ? a.subject === filter.subject : true))
+              .map((assignment) => (
               <div key={assignment.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
                 <div className="flex items-center justify-between mb-4">
                   <span className="bg-blue-100 text-blue-800 text-sm font-medium px-2.5 py-0.5 rounded">

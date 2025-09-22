@@ -142,3 +142,8 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
   }
 }
 ```
+
+## Quick Wins (Bugün Eklendi)
+
+- Öğrenci Sonuçları: "Zayıf Konu İçin Hızlı Tekrar" butonu eklendi. İlk zayıf konu için 3 soru anında üretilip ekranda gösterilir.
+- Öğretmen Dashboard: Sınıf ve ders filtreleri eklendi; ödev kartları filtrelenebilir.

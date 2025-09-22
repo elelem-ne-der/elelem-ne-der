@@ -19,6 +19,7 @@ export default function AssignmentPage() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitted, setSubmitted] = useState(false);
+  const [practiceSet, setPracticeSet] = useState<Question[] | null>(null);
   const [results, setResults] = useState<{
     weakTopics: string[];
     strongTopics: string[];
@@ -90,6 +91,29 @@ export default function AssignmentPage() {
       setSubmitted(true);
     } catch (error) {
       console.error('Error submitting answers:', error);
+    }
+  };
+
+  const handleQuickPractice = async () => {
+    try {
+      if (!results || results.weakTopics.length === 0) return;
+      const topic = results.weakTopics[0];
+      const response = await fetch('/api/backend/api/generate-questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic, grade: 5, count: 3 })
+      });
+      const data = await response.json();
+      const qs: Question[] = data.questions?.map((q: any, i: number) => ({
+        id: q.id ?? Date.now() + i,
+        question: q.question,
+        options: q.options,
+        correct_answer: q.correct_answer,
+        tags: q.tags || []
+      })) || [];
+      setPracticeSet(qs);
+    } catch (e) {
+      console.error('Quick practice failed', e);
     }
   };
 
@@ -191,7 +215,33 @@ export default function AssignmentPage() {
               >
                 Dashboard'a Dön
               </button>
+              {results.weakTopics.length > 0 && (
+                <button
+                  onClick={handleQuickPractice}
+                  className="ml-3 bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition"
+                >
+                  Zayıf Konu İçin Hızlı Tekrar
+                </button>
+              )}
             </div>
+
+            {practiceSet && practiceSet.length > 0 && (
+              <div className="mt-8">
+                <h3 className="text-xl font-semibold text-gray-900 mb-4">Hızlı Tekrar Soruları</h3>
+                <div className="space-y-6">
+                  {practiceSet.map((pq, idx) => (
+                    <div key={pq.id} className="border rounded-lg p-4">
+                      <div className="font-medium text-gray-900 mb-3">Soru {idx + 1}: {pq.question}</div>
+                      <ul className="space-y-2">
+                        {pq.options.map((op, oi) => (
+                          <li key={oi} className="text-gray-700">{String.fromCharCode(65 + oi)}. {op}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

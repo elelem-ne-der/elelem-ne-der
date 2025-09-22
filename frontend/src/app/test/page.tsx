@@ -10,11 +10,19 @@ export default function TestPage() {
     error?: string;
   } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [backendOverride, setBackendOverride] = useState<string>('');
+  const [adminToken, setAdminToken] = useState<string>('');
+
+  const buildUrl = (path: string) => {
+    if (!backendOverride) return `/api/backend${path}`;
+    const sep = path.includes('?') ? '&' : '?';
+    return `/api/backend${path}${sep}backend=${encodeURIComponent(backendOverride.replace(/\/$/, ''))}`;
+  };
 
   const testBackend = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/backend/api/assignments');
+      const response = await fetch(buildUrl('/api/assignments'));
       const data = await response.json();
       setTestResult({ success: true, data });
     } catch (error) {
@@ -28,14 +36,14 @@ export default function TestPage() {
     setLoading(true);
     try {
       // Önce basit bir test yapalım
-      const response = await fetch('/api/backend/api/status');
+      const response = await fetch(buildUrl('/api/status'));
 
       if (!response.ok) {
         throw new Error(`Backend çalışmıyor! Status: ${response.status}`);
       }
 
       // AI endpoint'ini test et
-      const aiResponse = await fetch('/api/backend/api/tag-question', {
+      const aiResponse = await fetch(buildUrl('/api/tag-question'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,10 +74,11 @@ export default function TestPage() {
   const testAdminDataEntry = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/backend/api/admin/seed-data', {
+      const response = await fetch(buildUrl('/api/admin/seed-data'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
         },
         body: JSON.stringify({
           type: 'student',
@@ -133,10 +142,11 @@ export default function TestPage() {
         ]
       };
 
-      const response = await fetch('/api/backend/api/admin/bulk-import', {
+      const response = await fetch(buildUrl('/api/admin/bulk-import'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(adminToken ? { Authorization: `Bearer ${adminToken}` } : {})
         },
         body: JSON.stringify(bulkData)
       });
@@ -163,6 +173,33 @@ export default function TestPage() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Test Sayfası</h1>
+        <div className="bg-white rounded-lg shadow p-6 mb-6">
+          <h2 className="text-lg font-semibold mb-4 text-gray-900">Ayarlar</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">Backend Override (opsiyonel)</label>
+              <input
+                type="text"
+                placeholder="https://elelem-ne-der-backend.vercel.app"
+                value={backendOverride}
+                onChange={(e) => setBackendOverride(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+              />
+              <p className="text-xs text-gray-500 mt-1">Boş bırakırsan `NEXT_PUBLIC_BACKEND_URL` kullanılır.</p>
+            </div>
+            <div>
+              <label className="block text-sm text-gray-700 mb-1">Admin JWT (opsiyonel)</label>
+              <input
+                type="password"
+                placeholder="Bearer token"
+                value={adminToken}
+                onChange={(e) => setAdminToken(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+              />
+              <p className="text-xs text-gray-500 mt-1">Admin endpoint'leri için kullanılır.</p>
+            </div>
+          </div>
+        </div>
         
         <div className="grid md:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow p-6">
@@ -197,6 +234,7 @@ export default function TestPage() {
           <p className="text-sm text-gray-600 mb-4">
             Bu test admin paneli üzerinden örnek öğrenci/öğretmen verisi ekler.
           </p>
+          <p className="text-xs text-gray-500 mb-4">Gerekirse yukarıdan JWT gir; aksi durumda 401 alabilirsin.</p>
           <div className="flex space-x-4">
             <button
               onClick={testAdminDataEntry}

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+function getBackendUrl(): string | undefined {
+  return process.env.NEXT_PUBLIC_BACKEND_URL || process.env.BACKEND_URL;
+}
 
 function buildTargetUrl(pathname: string, search: string): string {
   const base = (backendUrl || '').replace(/\/$/, '');
@@ -9,12 +11,27 @@ function buildTargetUrl(pathname: string, search: string): string {
 }
 
 async function proxy(request: NextRequest) {
-  if (!backendUrl) {
+  const configuredBackend = getBackendUrl();
+
+  if (!configuredBackend) {
     return NextResponse.json({ error: 'NEXT_PUBLIC_BACKEND_URL not set' }, { status: 500 });
   }
 
   const { pathname, searchParams } = new URL(request.url);
-  const targetUrl = buildTargetUrl(pathname, searchParams.toString());
+  const targetUrl = (() => {
+    // Allow temporary override via query param for debugging
+    const override = searchParams.get('backend');
+    const base = override || configuredBackend;
+    const baseStripped = (base || '').replace(/\/$/, '');
+    const path = pathname.replace(/^\/api\/backend/, '');
+    const query = (() => {
+      const sp = new URLSearchParams(searchParams);
+      sp.delete('backend');
+      const s = sp.toString();
+      return s ? `?${s}` : '';
+    })();
+    return `${baseStripped}${path}${query}`;
+  })();
 
   const headers = new Headers(request.headers);
   headers.delete('host');
@@ -45,6 +62,7 @@ async function proxy(request: NextRequest) {
   const responseHeaders = new Headers(response.headers);
   responseHeaders.delete('content-security-policy');
   responseHeaders.set('x-proxied-by', 'frontend-proxy');
+  responseHeaders.set('x-backend-configured', configuredBackend ? 'true' : 'false');
 
   const contentType = response.headers.get('content-type') || '';
   if (contentType.includes('application/json')) {

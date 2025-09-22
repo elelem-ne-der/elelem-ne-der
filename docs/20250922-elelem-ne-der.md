@@ -49,3 +49,21 @@ curl -X POST http://localhost:3001/api/ai/complete \
 Notlar:
 - Hata kökü: Supabase kolon tipi JSON/JSONB iken string gönderilmesi, bazı sorgularda “cannot get array length of a scalar” hatasına yol açıyordu.
 - Toplu içe aktarmada öğretmen verilerinde `teacher_number` artık `OGRT###` kullanılmalı.
+
+## 2025-09-22 — Tarayıcıdan AI Çağrıları (Terminalsiz)
+
+### Yapılanlar
+- Frontend'e bir proxy route eklendi: `frontend/src/app/api/backend/[...path]/route.ts`.
+- `frontend/src/app/test/page.tsx` güncellenerek doğrudan `http://localhost:3001` yerine `/api/backend/...` kullanıldı.
+
+### Nasıl Kullanılır
+1) Frontend ortam değişkenine backend adresini ekleyin:
+```
+frontend/.env.local
+NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
+```
+2) Frontend'i çalıştırın ve tarayıcıdan `/test` sayfasını açın. Butonlar artık proxy üzerinden backend'e gider; terminal komutu girmeden tarayıcıdan test edebilirsiniz.
+
+### Notlar
+- Proxy tüm HTTP metodlarını iletir ve `Content-Type: application/json` gövdesini otomatik taşır.
+- Production'da `NEXT_PUBLIC_BACKEND_URL` Vercel ortam değişkenlerine eklenmelidir.

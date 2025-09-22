@@ -111,3 +111,34 @@ NEXT_PUBLIC_BACKEND_URL=http://localhost:3001
 ### Notlar
 - Proxy tüm HTTP metodlarını iletir ve `Content-Type: application/json` gövdesini otomatik taşır.
 - Production'da `NEXT_PUBLIC_BACKEND_URL` Vercel ortam değişkenlerine eklenmelidir.
+
+## Genişletilmiş AI Analizi
+
+`/api/analyze-results` yanıtı genişletildi:
+
+- `rootCauses`: Kök neden listesi.
+  - `cause`: Metinsel açıklama (örn: "payda eşitleme eksikliği").
+  - `frequency`: Kaç soruda tekrarlandığı.
+  - `examples`: Örnek soru referansları (`questionId`, `tags`).
+- `subtopicBreakdown`: Alt konu bazında performans.
+  - Anahtar: alt konu adı (örn: "kesir toplama - payda eşitleme").
+  - Değer: `{ correct, total, rate }` (yüzde).
+
+Örnek yanıt:
+```
+{
+  "overallScore": 72.5,
+  "weakTopics": ["kesirler", "çıkarma"],
+  "strongTopics": ["toplama"],
+  "recommendations": ["kesirler, çıkarma konularını tekrar etmelisin"],
+  "roadmap": [ { "title": "kesirler konusunu tekrar et", ... } ],
+  "rootCauses": [
+    { "cause": "payda eşitleme eksikliği", "frequency": 2, "examples": [{"questionId":1,"tags":["kesirler","toplama"]}] },
+    { "cause": "işlem hatası (çıkarma)", "frequency": 1, "examples": [{"questionId":2,"tags":["kesirler","çıkarma"]}] }
+  ],
+  "subtopicBreakdown": {
+    "kesir toplama - payda eşitleme": { "correct": 1, "total": 2, "rate": 50 },
+    "kesir çıkarma - payda eşitleme": { "correct": 0, "total": 1, "rate": 0 }
+  }
+}
+```

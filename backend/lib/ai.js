@@ -108,7 +108,9 @@ async function analyzeResults(answers) {
       strongTopics: [],
       overallScore: 0,
       recommendations: [],
-      roadmap: []
+      roadmap: [],
+      rootCauses: [], // [{topic, cause, frequency, examples: [..]}]
+      subtopicBreakdown: {} // { subtopic: { correct, total, rate } }
     };
     
     // Basit analiz
@@ -117,6 +119,8 @@ async function analyzeResults(answers) {
     
     // Konu bazlı analiz
     const topicStats = {};
+    const causeStats = {}; // e.g. { 'işlem hatası': { count, examples: [...] } }
+    const subtopicStats = {}; // e.g. { 'kesir toplama payda eşitleme': { correct, total } }
     answers.forEach(answer => {
       answer.tags?.forEach(tag => {
         if (!topicStats[tag]) {
@@ -127,6 +131,43 @@ async function analyzeResults(answers) {
           topicStats[tag].correct++;
         }
       });
+
+      // Heuristic root-cause extraction (rule-based for demo)
+      if (!answer.is_correct) {
+        const joined = (answer.tags || []).join(' ').toLowerCase();
+        let cause = 'kavramsal eksik';
+        if (joined.includes('toplama') || joined.includes('+')) cause = 'işlem hatası (toplama)';
+        if (joined.includes('çıkarma') || joined.includes('-')) cause = 'işlem hatası (çıkarma)';
+        if (joined.includes('kesir')) cause = 'payda eşitleme eksikliği';
+        if (joined.includes('fiil')) cause = 'tanım/kural hatası (fiiller)';
+
+        if (!causeStats[cause]) {
+          causeStats[cause] = { count: 0, examples: [] };
+        }
+        causeStats[cause].count++;
+        if (causeStats[cause].examples.length < 3) {
+          causeStats[cause].examples.push({ questionId: answer.question_id, tags: answer.tags });
+        }
+
+        // Subtopic heuristic
+        const sub = joined.includes('kesir') && joined.includes('toplama')
+          ? 'kesir toplama - payda eşitleme'
+          : joined.includes('kesir') && joined.includes('çıkarma')
+          ? 'kesir çıkarma - payda eşitleme'
+          : (answer.tags && answer.tags[0]) || 'genel';
+        if (!subtopicStats[sub]) subtopicStats[sub] = { correct: 0, total: 0 };
+        subtopicStats[sub].total++;
+      } else {
+        const joined = (answer.tags || []).join(' ').toLowerCase();
+        const sub = joined.includes('kesir') && joined.includes('toplama')
+          ? 'kesir toplama - payda eşitleme'
+          : joined.includes('kesir') && joined.includes('çıkarma')
+          ? 'kesir çıkarma - payda eşitleme'
+          : (answer.tags && answer.tags[0]) || 'genel';
+        if (!subtopicStats[sub]) subtopicStats[sub] = { correct: 0, total: 0 };
+        subtopicStats[sub].total++;
+        subtopicStats[sub].correct++;
+      }
     });
     
     // Zayıf ve güçlü konuları belirle
@@ -153,6 +194,20 @@ async function analyzeResults(answers) {
         resources: [`${topic} konu anlatımı`, `${topic} örnek sorular`],
         estimated_time: 30
       });
+    });
+
+    // Root causes
+    analysis.rootCauses = Object.entries(causeStats)
+      .sort((a,b) => b[1].count - a[1].count)
+      .map(([cause, info]) => ({ cause, frequency: info.count, examples: info.examples }));
+
+    // Subtopic breakdown with rates
+    Object.entries(subtopicStats).forEach(([sub, st]) => {
+      analysis.subtopicBreakdown[sub] = {
+        correct: st.correct,
+        total: st.total,
+        rate: st.total ? Math.round((st.correct / st.total) * 100) : 0
+      };
     });
     
     return analysis;

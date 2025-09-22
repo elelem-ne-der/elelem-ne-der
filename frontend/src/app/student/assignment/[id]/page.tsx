@@ -24,6 +24,8 @@ export default function AssignmentPage() {
     strongTopics: string[];
     overallScore: number;
     recommendations: string[];
+    rootCauses?: { cause: string; frequency: number; examples: { questionId: number; tags: string[] }[] }[];
+    subtopicBreakdown?: Record<string, { correct: number; total: number; rate: number }>;
   } | null>(null);
 
   const fetchQuestions = async () => {
@@ -151,6 +153,36 @@ export default function AssignmentPage() {
                 ))}
               </ul>
             </div>
+
+            {results.rootCauses && results.rootCauses.length > 0 && (
+              <div className="bg-yellow-50 rounded-lg p-6 mb-8">
+                <h3 className="text-lg font-semibold text-yellow-800 mb-4">Kök Neden Analizi</h3>
+                <ul className="space-y-3">
+                  {results.rootCauses.map((rc, idx) => (
+                    <li key={idx} className="text-yellow-800">
+                      <div className="font-medium">• {rc.cause} <span className="text-xs text-yellow-700">(x{rc.frequency})</span></div>
+                      {rc.examples?.length > 0 && (
+                        <div className="mt-1 text-sm text-yellow-700">Örnek sorular: {rc.examples.map(e => `#${e.questionId}`).join(', ')} (etiketler: {rc.examples[0].tags.join(', ')})</div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {results.subtopicBreakdown && (
+              <div className="bg-indigo-50 rounded-lg p-6 mb-8">
+                <h3 className="text-lg font-semibold text-indigo-800 mb-4">Alt Konu Başarı Oranları</h3>
+                <div className="space-y-2">
+                  {Object.entries(results.subtopicBreakdown).map(([sub, st]) => (
+                    <div key={sub} className="flex items-center justify-between text-indigo-800">
+                      <div className="mr-4">{sub}</div>
+                      <div className="text-sm">{st.correct}/{st.total} ({st.rate}%)</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="text-center">
               <button

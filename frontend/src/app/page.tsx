@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import IconStream from '@/components/IconStream';
 
 export default function Home() {
@@ -25,8 +26,9 @@ export default function Home() {
       </div>
       <div className="container mx-auto px-4 py-16 relative z-10">
         <div className="text-center">
-          <h1 className="text-5xl font-bold text-white mb-6">
+          <h1 className="text-5xl font-bold text-white mb-6 flex items-center gap-3">
             Pusula
+            <Image src="/pusula-icon.png" alt="Pusula" width={64} height={64} className="heading-icon" />
           </h1>
           <p className="text-xl text-gray-600 mb-8">
             AI destekli kişiselleştirilmiş öğrenme platformu
